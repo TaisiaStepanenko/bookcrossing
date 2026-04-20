@@ -1,0 +1,11 @@
+.img-box {
+   div, img { 
+    border-radius: 0px !important;
+  }
+}
+
+.no-img {
+  background-color: #7F7F7F;
+  width: calc(100% / 3);
+  height: 88px;
+}

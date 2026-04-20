@@ -1,0 +1,143 @@
+import { User, City, Notification, Review, Transfer, Book, BookPhoto } from '../models';
+import {ExchangeType, ExchangeMethod} from '../constants/enums';
+import {BookCatalogItem} from './bookRepository';
+import {notificationRepository} from './notificationRepository';
+
+
+
+export const userRepository = {
+
+    async createUser( data: {
+        name: string,
+        email: string,
+        password: string,
+        city_id: number,
+        birthday_date: string,
+        description?: string | null
+    }): Promise<User> {
+        return User.create(data);
+    },
+
+    async findUserByEmail(email: string): Promise<User | null> {
+        return User.findOne({where: {email}});
+    },
+
+    async findUserByID(user_id: number): Promise<User | null> {
+        return User.findByPk(user_id, {
+            attributes: ['user_id', 'name', 'city_id', 'notification_number'],
+            include: [
+                {
+                    model: City,
+                    as: 'city', 
+                    attributes: ['name']
+                }
+            ]
+        });
+    },
+
+    async findProfileInfo(user_id: number): Promise<User | null> {
+        return User.findByPk(user_id, {
+            attributes: ['user_id', 'name', 'email', 'phone', 'city_id', 'birthday_date', 'rating', 'photo', 'description', 'notification_number', 'registration_date'],
+            include: [
+                {
+                    model: City,
+                    as: 'city', 
+                    attributes: ['city_id', 'name']
+                }
+            ]
+        });
+    },
+
+    async getUserStats(user_id: number) {
+        const reviewNumber = await Review.count({where: {reviewed_user_id: user_id}});
+        const completedExchanges = await Transfer.count({where: {type: 'COMPLETED'}});
+        const availableBooks = await Book.count({where: {owner_id: user_id, status: 'AVAILABLE'}});
+
+        return {reviewNumber, completedExchanges, availableBooks};
+    },
+
+    async getUserBooks(user_id: number) {
+        const books = await Book.findAll({
+            where: {owner_id: user_id, status: 'AVAILABLE'},
+            include: [
+                { model: BookPhoto, as: 'photos', attributes: ['photo_url'], where: {is_main: true}, required: false},
+                {model: User, as: 'owner', attributes: ['user_id', 'name'], include: [{ model: City, as: 'city', attributes: ['city_id', 'name'],}]}
+            ],
+            order: [['registration_date', 'DESC']]
+        })
+        return books.map((book: any) => ({
+            id: book.book_id,
+            name: book.name,
+            author: book.author,
+            place: book.owner?.city?.name || 'Не указан',
+            src: book.photos?.[0]?.photo_url || null,
+            exchangeType: book.exchangeType as ExchangeType,
+            exchangeMethod: book.exchangeMethod as ExchangeMethod,
+            isFavorite: false, // для списка книг владельца без текущего пользователя
+        }));
+    },
+
+    async getUserReviews(user_id: number) {
+
+        const reviews = await Review.findAll({
+            where: {reviewed_user_id: user_id},
+            attributes: ['review_id', 'rating', 'comment', 'review_date'],
+            include: [
+                {model: User, as: 'reviewer', attributes: ['user_id', 'name', 'photo']} 
+            ],
+            order: [['review_date', 'DESC']]
+        });
+
+        return reviews.map((review: any) => ({
+            review_id: review.review_id,
+            rating: review.rating,
+            comment: review.comment,
+            review_date: review.review_date,
+            reviewerInfo: {
+                user_id: review.reviewer.user_id,
+                name: review.reviewer.name,
+                photo: review.reviewer.photo || '',
+            }
+        }))
+    },
+
+    async updateProfileInfo(user_id: number, data: {
+        name?: string,
+        email?: string,
+        phone?: string,
+        city_id?: number,
+        birthday_date?: string,
+        photo?: string,
+        description?: string
+    }): Promise<[number, User[]]> {
+        return User.update(data, {where: {user_id: user_id}, returning: true});
+
+    },
+
+    async getNotifications(user_id: number) {
+        const notifications = await notificationRepository.findByTargetUser(user_id);
+        return notifications.map((n: any) => ({
+            notification_id: n.notification_id,
+            user_id: n.user_id,                  
+            user_name: n.initiator?.name || '',
+            transfer_id: n.transfer_id,
+            message_type: n.message_type,
+            is_read: n.is_read,
+            created_at: n.created_at,
+        }));
+    },
+
+    async incrementNotifications(user_id: number): Promise<void> {
+        await User.increment(
+            'notification_number', {where: {user_id}}
+        )
+    },
+
+    async resetNotifications(user_id: number): Promise<void> {
+        await User.update(
+            { notification_number: 0 },
+            { where: { user_id } }
+        );
+    }
+ 
+}

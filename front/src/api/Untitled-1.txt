@@ -1,0 +1,17 @@
+    GET	/api/cities	Список городов
+    POST	/api/user/registration	Регистрация
+    GET	/api/user/info	Базовая информация о текущем пользователе (требуется токен)
+    POST	/api/books	Каталог книг с фильтрами
+    GET	/api/user/profile/:id?	Профиль пользователя (если id не указан — свой)
+PUT	/api/books/add	Добавить новую книгу (multipart/form-data)
+POST	/api/books/favorite/:id	Добавить книгу в избранное
+GET	/api/user/notifications/:id	Уведомления пользователя
+POST	/api/books/edit/:id	Редактировать книгу
+DELETE	/api/books/delete/:id	Удалить книгу
+
+
+GET	/api/books/:id	Детальная информация о книге
+
+POST	/api/user/profile	Обновление профиля
+POST	/api/user/login	Вход, возвращает JWT-токен
+

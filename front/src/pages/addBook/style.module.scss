@@ -1,0 +1,20 @@
+.card {
+    height: 702px;
+    border-radius: 32px;
+    border: 1px solid black;
+    display: flex;
+}
+
+.card-img {
+    height: 702px;
+    border-top-left-radius: 32px;
+    border-bottom-left-radius: 32px;
+}
+
+.card-content {
+    padding: 0px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
