@@ -1,14 +1,116 @@
 import { useState } from 'react'
 
-import { Avatar, Button, Card, Flex, Image, Typography } from 'antd'
+import { Avatar, Button, Card, Flex, Image, Modal, Tag, Typography } from 'antd'
 
+import { useChangeStatus } from '../../api/hooks'
+import type { IncomingExchange, TransferStatus } from '../../api/models'
 import Arrows from '../../assets/arrows.png'
-import testImg from '../../assets/testImg.png'
+import { OFFER_COUNT } from '../exhange'
+import { CancelModal } from './cancelModal'
+import { StatusTag } from './statusTag'
 
 import styles from './styles.module.scss'
 
-export const ExchangeCard = ({ type }: { type: 'ALL' | 'ONE' }) => {
-  const [selected, setSelected] = useState('')
+export const ExchangeCard = ({
+  data,
+  type,
+}: {
+  data: IncomingExchange
+  type: 'incoming' | 'outcoming' | 'running' | 'ended'
+}) => {
+  const { mutate } = useChangeStatus(data.id)
+  const [selected, setSelected] = useState<number[]>([])
+  const [open, setOpen] = useState(false)
+
+  const onChangeSelected = (id: number) => {
+    if (OFFER_COUNT[data.bookCount] < selected.length) {
+      return null
+    } else {
+      if (!selected.includes(id)) {
+        setSelected([...selected, id])
+      } else {
+        setSelected(selected.filter((v) => v !== id))
+      }
+    }
+  }
+
+  const getTitle = () => {
+    if (type === 'incoming') {
+      return `${data.name} предлагает обмен!`
+    } else {
+      return `Обмен с пользователем ${data.name}`
+    }
+  }
+
+  const getHelperText = () => {
+    if (type === 'incoming') {
+      if (data.type === 'WAITING_RESPONSE') {
+        return ''
+      } else if (data.type === 'WAITING_CONFIRMATION') {
+        return 'Вы приняли предложение обмена. Дождитесь ответа от запрашивающего'
+      }
+    }
+    if (type === 'outcoming') {
+      if (data.type === 'WAITING_RESPONSE') {
+        return `${data.name} пока не принял ваше предложение`
+      } else if (data.type === 'WAITING_CONFIRMATION') {
+        return `${data.name} принял ваше предложение`
+      }
+    }
+
+    return ''
+  }
+
+  const getEndedText = () => {
+    if (data.type === 'COMPLETED_SUCCESS') {
+      return `Успешно завершён ${new Date(data.endedDate || '').toLocaleDateString()}`
+    } else if (data.type === 'COMPLETED_PREMATURELY') {
+      return `Досрочно завершён ${new Date(data.endedDate || '').toLocaleDateString()}`
+    } else if (data.type === 'CANCELLED') {
+      return 'Отменен'
+    } else {
+      return ''
+    }
+  }
+
+  const getIsDisabledAccept = () =>
+    (data.type === 'WAITING_RESPONSE' && OFFER_COUNT[data.bookCount] !== selected.length) ||
+    (type === 'incoming' && data.type === 'WAITING_CONFIRMATION') ||
+    (type === 'outcoming' && data.type === 'WAITING_RESPONSE')
+
+  const showRunningButtom = () => {
+    const { currentStatusInitiator, currentStatusOwner, userType, type } = data
+
+    if (
+      (type !== 'RECEIVED' && currentStatusInitiator === currentStatusOwner) ||
+      (currentStatusInitiator === 'WAITING_TO_BE_SENT' && currentStatusOwner === 'SENT' && userType === 'INITIATOR') ||
+      (currentStatusInitiator === 'SENT' && currentStatusOwner === 'WAITING_TO_BE_SENT' && userType === 'OWNER') ||
+      (currentStatusInitiator === 'SENT' && currentStatusOwner === 'RECEIVED' && userType === 'INITIATOR') ||
+      (currentStatusInitiator === 'RECEIVED' && currentStatusOwner === 'SENT' && userType === 'OWNER')
+    ) {
+      return true
+    }
+  }
+
+  const runningButtomText = () => {
+    const { currentStatusInitiator, currentStatusOwner, userType } = data
+
+    if (
+      (currentStatusInitiator === 'WAITING_TO_BE_SENT' && userType === 'INITIATOR') ||
+      (currentStatusOwner === 'WAITING_TO_BE_SENT' && userType === 'OWNER')
+    ) {
+      return 'Отправть'
+    }
+
+    if (
+      (currentStatusInitiator === 'SENT' && userType === 'INITIATOR') ||
+      (currentStatusOwner === 'SENT' && userType === 'OWNER')
+    ) {
+      return 'Получено'
+    }
+  }
+
+  const cancel = () => mutate({ activity: 'cancel' })
 
   return (
     <Card style={{ width: '100%' }}>
@@ -17,64 +119,110 @@ export const ExchangeCard = ({ type }: { type: 'ALL' | 'ONE' }) => {
           <Avatar />
           <Flex vertical>
             <Typography.Title style={{ margin: 0 }} level={4}>
-              Маша предлагает обмен!
+              {getTitle()}
             </Typography.Title>
-            <Typography.Text>{type === 'ALL' ? 'Все 3 книги на 1 вашу' : '1 из 3 книг на выбор'}</Typography.Text>
+            {getEndedText() ? (
+              <Typography.Text disabled>{getEndedText()}</Typography.Text>
+            ) : (
+              <Typography.Text>
+                {data.bookCount === 'THREE'
+                  ? 'Все 3 книги на 1 вашу'
+                  : data.bookCount === 'TWO'
+                    ? '2 из 3 книг на выбор'
+                    : '1 из 3 книг на выбор'}
+              </Typography.Text>
+            )}
           </Flex>
         </Flex>
         <Flex gap="small" align="center">
-          <Image src={testImg} height={240} width={178} />
+          <Image src={`${import.meta.env.VITE_API_URL}${data.ownerBook.src}`} height={240} width={178} />
           <Image src={Arrows} height={80} width={69} />
-          <Image
-            onClick={() => setSelected('1')}
-            src={testImg}
-            className={type === 'ALL' || selected === '1' ? styles.selected : undefined}
-            preview={false}
-            height={240}
-            width={178}
-          />
-          <Image
-            onClick={() => setSelected('2')}
-            src={testImg}
-            className={type === 'ALL' || selected === '2' ? styles.selected : undefined}
-            preview={false}
-            height={240}
-            width={178}
-          />
-          <Image
-            onClick={() => setSelected('3')}
-            src={testImg}
-            className={type === 'ALL' || selected === '3' ? styles.selected : undefined}
-            preview={false}
-            height={240}
-            width={178}
-          />
+          {data.initiatorBooks.map((book) => (
+            <Image
+              onClick={() => type === 'incoming' && data.type === 'WAITING_RESPONSE' && onChangeSelected(book.id)}
+              src={`${import.meta.env.VITE_API_URL}${book.src}`}
+              className={selected.includes(book.id) ? styles.selected : undefined}
+              preview={false}
+              key={book.id}
+              height={240}
+              width={178}
+            />
+          ))}
         </Flex>
         <Flex gap="middle">
           <Flex vertical>
             <Typography.Title style={{ margin: 0 }} level={4}>
-              Вы отдаете
+              {data.userType === 'OWNER' ? 'Вы отдаете' : 'Вы получаете'}
             </Typography.Title>
-            <Typography.Text>Гарри Поттер и Принц-полукровка</Typography.Text>
+            <Typography.Text>{data.ownerBook.name}</Typography.Text>
           </Flex>
           <Flex vertical>
             <Typography.Title style={{ margin: 0 }} level={4}>
-              Вы получаете
+              {data.userType === 'INITIATOR' ? 'Вы отдаете' : 'Вы получаете'}
             </Typography.Title>
-            <Typography.Text>1. Гарри Поттер и Принц-полукровка</Typography.Text>
-            <Typography.Text>2. Гарри Поттер и Принц-полукровка</Typography.Text>
-            <Typography.Text>3. Гарри Поттер и Принц-полукровка</Typography.Text>
+            {data.initiatorBooks.map((book, index) => (
+              <Typography.Text key={book.id}>
+                {index + 1}. {book.name}
+              </Typography.Text>
+            ))}
           </Flex>
         </Flex>
-        <Flex gap="small">
-          <Button color="default" disabled={type === 'ONE' && !selected} variant="solid">
-            Обменяться
-          </Button>
-          <Button color="orange" variant="outlined">
-            Отклонить всё
-          </Button>
-        </Flex>
+        {type === 'running' && (
+          <Flex gap="middle">
+            <Flex vertical gap="small">
+              <Typography.Title style={{ margin: 0 }} level={4}>
+                Текущий статус
+              </Typography.Title>
+              <StatusTag status={data.currentStatusOwner} />
+            </Flex>
+            <Flex vertical gap="small">
+              <Typography.Title style={{ margin: 0 }} level={4}>
+                Текущий статус
+              </Typography.Title>
+              <StatusTag status={data.currentStatusInitiator} />
+            </Flex>
+          </Flex>
+        )}
+        {type === 'running' && (
+          <Flex vertical gap="middle">
+            {showRunningButtom() && (
+              <Button
+                color="default"
+                disabled={getIsDisabledAccept()}
+                variant="solid"
+                style={{ width: 156 }}
+                onClick={() => mutate({ activity: 'accept' })}
+              >
+                {runningButtomText()}
+              </Button>
+            )}
+            <Button color="orange" variant="outlined" style={{ width: 156 }} onClick={() => setOpen(true)}>
+              Завершить обмен
+            </Button>
+            <Typography.Text disabled>
+              В случае возникновения проблем с данным обменом нажмитена эту кнопку
+            </Typography.Text>
+          </Flex>
+        )}
+
+        <Typography.Text strong>{getHelperText()}</Typography.Text>
+        {(type === 'outcoming' || type === 'incoming') && (
+          <Flex gap="small">
+            <Button
+              color="default"
+              disabled={getIsDisabledAccept()}
+              variant="solid"
+              onClick={() => mutate({ activity: 'accept', keptBookIds: selected })}
+            >
+              Обменяться
+            </Button>
+            <Button color="orange" variant="outlined" onClick={() => cancel()}>
+              Отклонить
+            </Button>
+          </Flex>
+        )}
       </Flex>
+      {open && <CancelModal setOpen={setOpen} cancel={cancel} />}
     </Card>
   )
 }

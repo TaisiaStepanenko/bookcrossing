@@ -1,7 +1,6 @@
 import express from 'express';
 import authRoutes from './routes/authRoutes';
 import userRoutes from './routes/userRoutes';
-import notificationRoutes from './routes/notificationRoutes';
 import bookRoutes from './routes/bookRoutes';
 import cityRoutes from './routes/cityRoutes';
 import exchangesRoutes from './routes/exchangeRoutes';
@@ -20,7 +19,6 @@ app.use(cors({
 app.use(express.json());
 app.use('/api', authRoutes);
 app.use('/api/user', userRoutes);
-app.use('/api/user', notificationRoutes); 
 app.use('/api/books', bookRoutes);
 app.use('/api', cityRoutes);
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));

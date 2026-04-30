@@ -4,7 +4,7 @@ import { CloseOutlined } from '@ant-design/icons'
 
 import { Avatar, Button, Card, Col, Flex, Image, message, Modal, Pagination, Row, Typography } from 'antd'
 
-import { useGetBooks } from '../../api/hooks'
+import { useAddExchange, useGetBooks } from '../../api/hooks'
 import { OFFER_TYPE, type OfferType } from '../../api/models'
 import AddBookExchange from '../../assets/addBookExchange.png'
 import Arrows from '../../assets/arrows.png'
@@ -32,7 +32,7 @@ interface Selected {
   id: number
 }
 
-const OFFER_COUNT: Record<OfferType, number> = {
+export const OFFER_COUNT: Record<OfferType, number> = {
   ONE: 1,
   TWO: 2,
   THREE: 3,
@@ -43,6 +43,8 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
   const [selected, setSelected] = useState<Selected[]>([])
   const [getBookOpened, setGetBookOpened] = useState(false)
   const [error, setError] = useState('')
+
+  const { mutate } = useAddExchange()
 
   const maxCount = OFFER_COUNT[offerType]
 
@@ -58,6 +60,12 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
     }
 
     setError('')
+    console.log('asdasdasd')
+    mutate({
+      offeredBookIds: selected.map((item) => item.id),
+      offerType: offerType,
+      targetBookId: book.id,
+    })
     message.success('Обмен отправлен!')
     close()
   }
@@ -137,7 +145,6 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
         <CustomSelect
           onChange={(v) => {
             setOfferType(v)
-            console.log(OFFER_COUNT[v], selected.length)
 
             if (OFFER_COUNT[v] < selected.length) setSelected([]) // сбрасываем выбор при смене типа
           }}
@@ -188,8 +195,8 @@ const GetBook = ({
   selected: Selected[]
   maxCount: number
 }) => {
-  const [page, setPage] = useState(1)
-  const { data } = useGetBooks({ page })
+  const [page, setPage] = useState(0)
+  const { data } = useGetBooks({ page, myBook: true })
 
   const onSelect = (book: Selected) => {
     if (selected.length >= maxCount) {

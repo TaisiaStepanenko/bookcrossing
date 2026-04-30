@@ -4,8 +4,21 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 import service from '../axios'
 import { useUserStore } from '../store/user'
-import { BOOKPAGEMOCK } from './mocks'
-import type { Book, BooksCatalog, BooksFilters, Login, Registration, RegistrationReturn, UserProfile } from './models'
+import type {
+  Book,
+  BookExchange,
+  BooksCatalog,
+  BooksFilters,
+  ChangeStatus,
+  IncomingAllExchanges,
+  IncomingExchange,
+  Login,
+  Notification,
+  Registration,
+  RegistrationReturn,
+  UpdateProfile,
+  UserProfile,
+} from './models'
 
 // USER
 
@@ -44,14 +57,28 @@ export const useLogin = () => {
 
 const login = (data: Login): Promise<RegistrationReturn> => service.post('/api/user/login', data)
 
-export const useGetProfile = (id?: string) => useQuery({ queryKey: ['books', id], queryFn: () => getProfile(id) })
+export const useUpdateProfile = () => {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
-const getProfile = (id?: string): Promise<UserProfile> => service.get(`api/user/profile/${id}`)
+  return useMutation({
+    mutationFn: (data: UpdateProfile) => updateProfile(data),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({ queryKey: ['profile'], refetchType: 'active' })
+      navigate('/profile')
+    },
+  })
+}
 
-export const useGetNotification = (filters: BooksFilters) =>
-  useQuery({ queryKey: ['books', filters], queryFn: () => getBooks(filters) })
+const updateProfile = (data: UpdateProfile): Promise<UpdateProfile> => service.post('/api/user/profile', data)
 
-const getNotification = (): Promise<BooksCatalog> => service.get('/api/user/notifications', filters)
+export const useGetProfile = (id?: string) => useQuery({ queryKey: ['profile', id], queryFn: () => getProfile(id) })
+
+const getProfile = (id?: string): Promise<UserProfile> => service.get(`/api/user/profile/${id}`)
+
+export const useGetNotification = () => useQuery({ queryKey: ['notifications'], queryFn: () => getNotification() })
+
+const getNotification = (): Promise<Notification[]> => service.get('/api/user/notifications')
 
 // COMMON
 export const useGetCities = () => useQuery({ queryKey: ['cities'], queryFn: () => getCities() })
@@ -62,25 +89,38 @@ const getCities = (): Promise<{ cityId: number; name: string }[]> => service.get
 export const useGetBooks = (filters: BooksFilters) =>
   useQuery({ queryKey: ['books', filters], queryFn: () => getBooks(filters) })
 
-const getBooks = (filters: BooksFilters): Promise<BooksCatalog> => service.post('api/books', filters)
+const getBooks = (filters: BooksFilters): Promise<BooksCatalog> => service.post('/api/books', filters)
 
 export const useAddFavorite = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (id: number) => addFavorite(id),
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['books'], refetchType: 'active' })
+    mutationFn: (bookId: number) => service.post(`/api/books/favorite/${bookId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] })
+      queryClient.invalidateQueries({ queryKey: ['books', { favorite: true }] })
     },
   })
 }
 
-const addFavorite = (id: number): Promise<RegistrationReturn> => service.post(`api/books/favorite/${id}`)
+const addFavorite = (id: number): Promise<RegistrationReturn> => service.post(`/api/books/favorite/${id}`)
+
+export const useRemoveFavorite = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (bookId: number) => service.delete(`/api/books/favorite/${bookId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['books'] })
+      queryClient.invalidateQueries({ queryKey: ['books', { favorite: true }] })
+    },
+  })
+}
 
 export const useGetBook = (id: number) =>
   useQuery({ queryKey: ['books', id], queryFn: () => getBook(id), enabled: !!id })
 
-const getBook = (id: number): Promise<Book> => service.get(`api/books/${id}`)
+const getBook = (id: number): Promise<Book> => service.get(`/api/books/${id}`)
 
 export const useAddBook = () => {
   return useMutation({
@@ -88,7 +128,7 @@ export const useAddBook = () => {
   })
 }
 
-const addBook = (data: FormData): Promise<void> => service.put('api/books/add', data)
+const addBook = (data: FormData): Promise<void> => service.put('/api/books/add', data)
 
 export const useUpdateBook = () => {
   return useMutation({
@@ -96,7 +136,7 @@ export const useUpdateBook = () => {
   })
 }
 
-const updateBook = (id: number, data: FormData): Promise<void> => service.post(`api/books/edit/${id}`, data)
+const updateBook = (id: number, data: FormData): Promise<void> => service.post(`/api/books/edit/${id}`, data)
 
 export const useDeleteBook = () => {
   const queryClient = useQueryClient()
@@ -107,4 +147,62 @@ export const useDeleteBook = () => {
   })
 }
 
-const deleteBook = (id: number): Promise<void> => service.delete(`api/books/delete/${id}`)
+const deleteBook = (id: number): Promise<void> => service.delete(`/api/books/delete/${id}`)
+
+// EXCHANGES
+
+export const useAddExchange = () => {
+  return useMutation({
+    mutationFn: (exchange: BookExchange) => addExchange(exchange),
+  })
+}
+
+const addExchange = (exchange: BookExchange): Promise<void> => {
+  return service.post(`/api/exchanges/add/${exchange.targetBookId}`, exchange)
+}
+
+export const useGetIncomingExchanges = () =>
+  useQuery({ queryKey: ['incoming exchanges'], queryFn: () => getExchanges() })
+
+const getExchanges = (): Promise<IncomingAllExchanges[]> => service.get(`/api/exchanges/incoming`)
+
+export const useGetExchange = (
+  type: 'incoming' | 'outcoming' | 'running' | 'ended',
+  id?: string,
+  isDisabled?: boolean,
+) => {
+  return useQuery({
+    queryKey: ['Exchanges', type, id],
+    queryFn: () => getExchange(type, id),
+    enabled: !isDisabled,
+  })
+}
+
+const getExchange = (type: 'incoming' | 'outcoming' | 'running' | 'ended', id?: string): Promise<IncomingExchange[]> =>
+  service.get(`/api/exchanges/${type}/${id}`)
+
+export const useChangeStatus = (id: number) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (exchange: ChangeStatus) => changeStatus(id, exchange),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['Exchanges'], refetchType: 'all' }),
+  })
+}
+
+const changeStatus = (id: number, exchange: ChangeStatus): Promise<void> => {
+  return service.patch(`/api/exchanges/change/${id}`, exchange)
+}
+
+export const useRejectAll = (id: number) => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => rejectAll(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['incoming exchanges'], refetchType: 'all' }),
+  })
+}
+
+const rejectAll = (id: number): Promise<void> => {
+  return service.patch(`/api/exchanges/incoming/rejectAll/${id}`)
+}

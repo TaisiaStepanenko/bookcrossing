@@ -2,21 +2,27 @@ import { useState } from 'react'
 
 import { Breadcrumb, Button, Flex } from 'antd'
 
+import { useGetExchange, useGetIncomingExchanges } from '../../api/hooks'
 import { ExchangeBaseCard } from '../exchangeBaseCard'
 import { ExchangeCard } from '../exchangeCard'
 
 import styles from './styles.module.scss'
 
-export const BooksExchanges = () => {
+export const BooksExchanges = ({ type }: { type?: 'running' | 'ended' }) => {
   const [selected, setSelected] = useState('income')
   const [request, setExchange] = useState({ id: '', name: '' })
 
+  const changeSelected = (selected: string) => {
+    setSelected(selected)
+    setExchange({ id: '', name: '' })
+  }
+
   return (
     <Flex vertical gap="small" style={{ width: '100%' }}>
-      {!request.id ? (
+      {!type && (
         <Flex gap="small">
           <Button
-            onClick={() => setSelected('income')}
+            onClick={() => changeSelected('income')}
             color="default"
             variant="outlined"
             className={selected === 'income' ? styles['selected-btn'] : styles['not-selected-btn']}
@@ -24,7 +30,7 @@ export const BooksExchanges = () => {
             Входящие заявки
           </Button>
           <Button
-            onClick={() => setSelected('outgoing')}
+            onClick={() => changeSelected('outgoing')}
             color="default"
             variant="outlined"
             className={selected === 'outgoing' ? styles['selected-btn'] : styles['not-selected-btn']}
@@ -32,7 +38,40 @@ export const BooksExchanges = () => {
             Исходящие заявки
           </Button>
         </Flex>
-      ) : (
+      )}
+      <Flex vertical style={{ maxHeight: '1000px', overflow: 'auto' }} gap={'small'}>
+        {selected === 'income' && !type ? (
+          <Incomming id={request.id} setExchange={setExchange} name={request.name} selected={selected} />
+        ) : (
+          <ExhangesList type={type || 'outcoming'} />
+        )}
+      </Flex>
+    </Flex>
+  )
+}
+
+const Incomming = ({
+  id,
+  setExchange,
+  name,
+  selected,
+}: {
+  id: string
+  selected: string
+  name: string
+  setExchange: React.Dispatch<
+    React.SetStateAction<{
+      id: string
+      name: string
+    }>
+  >
+}) => {
+  const { data } = useGetIncomingExchanges()
+  const incomingExchange = useGetExchange('incoming', id, !id)
+
+  return (
+    <>
+      {id && (
         <Breadcrumb
           separator=">"
           items={[
@@ -42,40 +81,21 @@ export const BooksExchanges = () => {
               onClick: () => setExchange({ id: '', name: '' }),
               style: { cursor: 'pointer' },
             },
-            { title: request.name },
+            { title: name },
           ]}
         />
       )}
-      <Flex vertical style={{ maxHeight: '1000px', overflow: 'auto' }} gap={'small'}>
-        {!request.id ? (
-          <>
-            <ExchangeBaseCard setExchange={setExchange} />
-            <ExchangeBaseCard setExchange={setExchange} />
-            <ExchangeBaseCard setExchange={setExchange} />
-            <ExchangeBaseCard setExchange={setExchange} />
-            <ExchangeBaseCard setExchange={setExchange} />
-            <ExchangeBaseCard setExchange={setExchange} />
-            <ExchangeBaseCard setExchange={setExchange} />
-            <ExchangeBaseCard setExchange={setExchange} />
-            <ExchangeBaseCard setExchange={setExchange} />
-            <ExchangeBaseCard setExchange={setExchange} />
-          </>
-        ) : (
-          <>
-            <ExchangeCard type="ALL" />
-            <ExchangeCard type="ONE" />
-
-            <ExchangeCard type="ALL" />
-            <ExchangeCard type="ALL" />
-            <ExchangeCard type="ALL" />
-            <ExchangeCard type="ONE" />
-            <ExchangeCard type="ONE" />
-
-            <ExchangeCard type="ALL" />
-            <ExchangeCard type="ONE" />
-          </>
-        )}
-      </Flex>
-    </Flex>
+      {!id
+        ? data?.map((data) => <ExchangeBaseCard data={data} key={data.id} setExchange={setExchange} />)
+        : incomingExchange.data?.map((data) => <ExchangeCard data={data} type="incoming" key={data.id} />)}
+    </>
   )
+}
+
+const ExhangesList = ({ type }: { type: 'outcoming' | 'running' | 'ended' }) => {
+  const exchanges = useGetExchange(type)
+
+  console.log(type)
+
+  return exchanges.data?.map((data) => <ExchangeCard key={data.id} data={data} type={type} />)
 }

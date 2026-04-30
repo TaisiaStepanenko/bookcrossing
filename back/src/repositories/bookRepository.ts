@@ -18,7 +18,6 @@ export interface BookFilter {
     page: number;
     myBook?: boolean;
     isFavorite?: boolean;
-    userId?: number;
 }
 
 
@@ -60,7 +59,7 @@ export interface BookEdit {
 export const BookRepository = {
 
 
-    async findWithFilter(filter: BookFilter): Promise<{ items: BookCatalogItem[]; page: number, totalPages: number }> {
+    async findWithFilter(filter: BookFilter, user_id?: number): Promise<{ items: BookCatalogItem[]; page: number, totalPages: number }> {
         const limit = 12;
         const where: any = {};
         const include: any[] = [];
@@ -102,24 +101,24 @@ export const BookRepository = {
 
         where.status = 'AVAILABLE';
 
-        if (filter.myBook && filter.userId) {
-            where.owner_id = filter.userId;
+        if (filter.myBook && user_id) {
+            where.owner_id = user_id;
         }
 
-        if (filter.isFavorite && filter.userId) {
+        if (filter.isFavorite && user_id) {
             include.push({
                 model: Favorite,
                 as: 'favorites',
                 attributes: [],
-                where: { user_id: filter.userId },
+                where: { user_id: user_id },
                 required: true
             });
-        } else if (filter.userId) {
+        } else if (user_id) {
             include.push({
                 model: Favorite,
                 as: 'favorites',
                 attributes: ['user_id'],
-                where: { user_id: filter.userId },
+                where: { user_id: user_id },
                 required: false
             });
         }
@@ -165,9 +164,10 @@ export const BookRepository = {
             const mainPhoto = book.photos?.[0];
 
             let isFavorite = false;
-            if (filter.userId && book.favorites) {
+            console.log(book)
+            if (user_id && book.favorites) {
                 isFavorite = Array.isArray(book.favorites)
-                    ? book.favorites.some((f: any) => f.user_id === filter.userId)
+                    ? book.favorites.some((f: any) => f.user_id === user_id)
                     : false;
             }
 
@@ -246,15 +246,9 @@ export const BookRepository = {
 
         const otherBooks = await this.findOtherBooksByOwner(owner!.user_id, book_id)
 
-        const usersBook = await Book.findOne({
-            where: { owner_id: owner?.user_id, book_id: book_id }
-        });      
         
-        let isMyBook = false;
-        if (usersBook) {
-            isMyBook = true;
-        }
-
+        const isMyBook = user_id && user_id === owner?.user_id
+console.log(user_id, owner?.user_id)
         return {
             bookId: book.book_id,
             photos: (photos).map((p: any) => ({

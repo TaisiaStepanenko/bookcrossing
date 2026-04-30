@@ -6,14 +6,14 @@ import { useGetBooks } from '../../api/hooks'
 import { BookCard } from '../bookCard'
 
 export const MyBooks = ({ isFavorite }: { isFavorite: boolean }) => {
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(0)
   const { data } = useGetBooks(isFavorite ? { favorite: true, page } : { myBook: true, page })
 
   return (
     <Row gutter={[20, 20]} style={{ width: '100%', marginLeft: 20 }}>
       {data?.items.map((item) => (
         <Col xs={8} key={item.id}>
-          <BookCard item={item} />
+          <BookCard item={{ ...item, isFavorite: isFavorite }} />
         </Col>
       ))}
       <Col span={24}>

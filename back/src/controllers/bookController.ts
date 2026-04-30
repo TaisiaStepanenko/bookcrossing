@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { Request, Response } from 'express';
 import { bookService } from '../services/bookService';
 import { Place, ExchangeMethod, BookCondition, ExchangeType, BookCover } from '../constants/enums';
+import { verifyToken } from '../utils/jwt';
 import { url } from 'inspector';
 import { ur } from 'zod/v4/locales';
 
@@ -43,7 +44,16 @@ export const bookEditSchema = z.object({
 export const bookController = {
     async getCatalog(req: Request, res: Response) {
         try {
-            const userId = (req as any).user?.id; 
+            const authHeader = req.headers.authorization;
+            if (!authHeader) {
+                return res.status(401).json({ message: 'No token provided' });
+            }
+
+            const token = authHeader.split(' ')[1];
+            const decoded: any = verifyToken(token);
+            
+            const userId = decoded.id
+
             const parsed = catalogFilterSchema.parse(req.body);
 
             const filter = {
@@ -75,7 +85,12 @@ export const bookController = {
             if (isNaN(bookId)) {
                 return res.status(400).json({ message: 'Invalid book id' });
             }
-            const userId = (req as any).user?.id;
+
+            const authHeader = req.headers.authorization;
+            const token = authHeader?.split(' ')[1];
+            const decoded: any = token&& verifyToken(token);
+
+            const userId = decoded.id;
 
             const book = await bookService.getBookInfo(bookId, userId);
             res.json(book);
@@ -206,5 +221,21 @@ export const bookController = {
             res.status(500).json({ message: error.message });
         }
 
+    },
+
+    async removeBookFromFavorites(req: Request, res: Response) {
+        try {
+            const userId = (req as any).user?.id;
+            const bookId = parseInt(req.params.id);
+
+            if (!userId) return res.status(401).json({ message: 'Unauthorized' });
+            
+            if (isNaN(bookId)) return res.status(400).json({ message: 'Invalid book id' });
+            
+            const result = await bookService.removeFavBook(userId, bookId);
+            res.json(result);
+        } catch (error: any) {
+            res.status(400).json({ message: error.message });
+        }
     }
 };

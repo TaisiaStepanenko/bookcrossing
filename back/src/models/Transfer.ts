@@ -16,17 +16,15 @@ interface TransferAttributes {
     transfer_id: number;   
 	initiator_id: number;
 	owner_id: number;
-	book_id: number;
-	initiator_confirm: boolean; 
-	owner_confirm: boolean; 
-	type: TransferType; 
+	book_id: number; 
+	cur_status: TransferStatus; 
 	offerType: OfferType; 
 	current_status_initiator: TransferStatus; 
 	current_status_owner: TransferStatus; 
 	created_at: string
 }
 
-interface TransferCreationAttributes extends Optional<TransferAttributes, 'transfer_id' | 'initiator_confirm' | 'owner_confirm' | 'type' |
+interface TransferCreationAttributes extends Optional<TransferAttributes, 'transfer_id' | 'cur_status' |
     'current_status_initiator' | 'current_status_owner' | 'created_at'> {}
 
 class Transfer extends Model<TransferAttributes, TransferCreationAttributes> implements TransferAttributes {
@@ -34,9 +32,7 @@ class Transfer extends Model<TransferAttributes, TransferCreationAttributes> imp
 	public initiator_id!: number;
 	public owner_id!: number;
 	public book_id!: number;
-	public initiator_confirm!: boolean; 
-	public owner_confirm!: boolean; 
-	public type!: TransferType; 
+	public cur_status!: TransferStatus; 
 	public offerType!: OfferType; 
 	public current_status_initiator!: TransferStatus; 
 	public current_status_owner!: TransferStatus; 
@@ -74,20 +70,10 @@ Transfer.init ({
             key: 'book_id'
         }
     },
-	initiator_confirm: {
-        type: DataTypes.BOOLEAN,
+	cur_status: {
+        type: DataTypes.ENUM(...TransferStatusValues),
         allowNull: false,
-        defaultValue: false
-    }, 
-	owner_confirm: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-    }, 
-	type: {
-        type: DataTypes.ENUM(...TransferTypeValues),
-        allowNull: false,
-        defaultValue: 'REQUEST'
+        defaultValue: 'WAITING_RESPONSE'
     }, 
 	offerType: {
         type: DataTypes.ENUM(...OfferTypeValues),

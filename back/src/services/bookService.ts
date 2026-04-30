@@ -10,10 +10,8 @@ export const bookService = {
 
     async getCatalog(filter: BookFilter, user_id?: number) {
         const copyFilter = {...filter};
-        if (user_id) {
-            copyFilter.userId = user_id;
-        }
-        return BookRepository.findWithFilter(copyFilter);
+        
+        return BookRepository.findWithFilter(copyFilter, user_id);
 
     },
 
@@ -111,5 +109,12 @@ export const bookService = {
             throw new Error('Delete failed');
         }
         return { message: 'Book deleted successfully' };
+    },
+
+    async removeFavBook(user_id: number, book_id: number) {
+        const deleted = await BookRepository.deleteBookFromFavorites({ user_id, book_id });
+        
+        if (deleted === 0) throw new Error('Favorite not found');
+        return { message: 'Book removed from favorites' };
     }
 }

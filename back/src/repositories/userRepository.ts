@@ -1,7 +1,8 @@
 import { User, City, Notification, Review, Transfer, Book, BookPhoto } from '../models';
-import {ExchangeType, ExchangeMethod} from '../constants/enums';
+import {ExchangeType, ExchangeMethod, TransferStatus} from '../constants/enums';
 import {BookCatalogItem} from './bookRepository';
 import {notificationRepository} from './notificationRepository';
+import {STATUS_TABS} from '../constants/enums';
 
 
 
@@ -50,7 +51,7 @@ export const userRepository = {
 
     async getUserStats(user_id: number) {
         const reviewNumber = await Review.count({where: {reviewed_user_id: user_id}});
-        const completedExchanges = await Transfer.count({where: {type: 'COMPLETED'}});
+        const completedExchanges = await Transfer.count({where: {cur_status: TransferStatus.COMPLETED_SUCCESS}});
         const availableBooks = await Book.count({where: {owner_id: user_id, status: 'AVAILABLE'}});
 
         return {reviewNumber, completedExchanges, availableBooks};
@@ -116,7 +117,9 @@ export const userRepository = {
 
     async getNotifications(user_id: number) {
         const notifications = await notificationRepository.findByTargetUser(user_id);
-        return notifications.map((n: any) => ({
+        
+
+        return notifications.map((n) => ({
             notification_id: n.notification_id,
             user_id: n.user_id,                  
             user_name: n.initiator?.name || '',
@@ -124,6 +127,8 @@ export const userRepository = {
             message_type: n.message_type,
             is_read: n.is_read,
             created_at: n.created_at,
+            cur_stutus: STATUS_TABS[n.transfer.cur_status]
+            
         }));
     },
 

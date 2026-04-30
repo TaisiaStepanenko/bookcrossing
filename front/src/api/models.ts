@@ -19,6 +19,16 @@ export interface RegistrationReturn {
   notificationNumber: number
 }
 
+export interface UpdateProfile {
+  name?: string
+  email?: string
+  phone?: string
+  cityId?: number
+  birthdayDate?: string
+  photo?: string
+  description?: string
+}
+
 export interface UserProfile {
   availableBooks: number
   birthdayDate: string
@@ -159,3 +169,73 @@ export const OFFER_TYPE = {
 } as const
 
 export type OfferType = keyof typeof OFFER_TYPE
+
+export interface BookExchange {
+  targetBookId: number
+  offeredBookIds: number[]
+  offerType: OfferType
+}
+
+export interface IncomingAllExchanges {
+  id: number
+  name: string
+  src: string
+  people: {
+    id: number
+    name: string
+    avatar: string
+  }[]
+}
+
+export interface IncomingExchange {
+  id: number
+  name: string
+  avatar: string
+  bookCount: OfferType
+  userType: 'OWNER' | 'INITIATOR'
+  type: TransferStatus
+  currentStatusInitiator: TransferStatus
+  currentStatusOwner: TransferStatus
+  endedDate?: string
+  ownerBook: {
+    id: number
+    name: string
+    src: string
+  }
+  initiatorBooks: {
+    id: number
+    name: string
+    src: string
+  }[]
+}
+
+export const TRANSFER_STATUS = {
+  WAITING_RESPONSE: 'WAITING_RESPONSE',
+  WAITING_CONFIRMATION: 'WAITING_CONFIRMATION',
+
+  WAITING_TO_BE_SENT: 'WAITING_TO_BE_SENT',
+  SENT: 'SENT',
+  RECEIVED: 'RECEIVED',
+
+  COMPLETED_SUCCESS: 'COMPLETED_SUCCESS',
+  CANCELLED: 'CANCELLED',
+  COMPLETED_PREMATURELY: 'COMPLETED_PREMATURELY',
+}
+
+export type TransferStatus = keyof typeof TRANSFER_STATUS
+
+export interface Notification {
+  notificationId: number
+  userId: number
+  userName: string
+  transferId: number
+  messageType: 'EXCHANGE' | 'REVIEW'
+  isRead: boolean
+  createdAt: string
+}
+
+export interface ChangeStatus {
+  activity: 'accept' | 'cancel'
+  keptBookIds?: number[]
+  acceptOffer?: number
+}

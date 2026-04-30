@@ -128,7 +128,6 @@ export default [
       'comma-dangle': ['warn', 'never'],
       'import/no-anonymous-default-export': 'off',
       'import/no-cycle': 'off',
-      'no-restricted-imports': ['warn', { patterns: ['../../*'] }],
       'import/no-unresolved': 'off',
       'import/extensions': 'off',
 

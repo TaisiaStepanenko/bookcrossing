@@ -3,25 +3,28 @@ import { useNavigate } from 'react-router-dom'
 
 import { Card, Flex, Typography } from 'antd'
 
+import { BooksExchanges } from '../../components/bookExchange'
 import { Container } from '../../components/common/container'
 import { MyBooks } from '../../components/myBooks'
 import { UserProfile } from '../../components/userProfile'
+import { useUserStore } from '../../store/user'
 
 import styles from './styles.module.scss'
-import { BooksExchanges } from '../../components/bookExchange'
 
 const BUTTONS = [
   { name: 'PROFILE', icon: null, title: 'Личная информация' },
   { name: 'MY_BOOKS', icon: null, title: 'Мои книги' },
   { name: 'FAVORITE', icon: null, title: 'Избранное' },
   { name: 'REQUESTS', icon: null, title: 'Заявки на обмен' },
-  { name: '', icon: null, title: 'Текущие обмены' },
-  { name: '', icon: null, title: 'Завершенные обмены' },
+  { name: 'RUNNING_REQUESTS', icon: null, title: 'Текущие обмены' },
+  { name: 'ENDED_REQUESTS', icon: null, title: 'Завершенные обмены' },
 ]
 
 export const ProfilePage = () => {
   const navigate = useNavigate()
-  const [selected, setSelected] = useState('PROFILE')
+  const profilePage = useUserStore((store) => store.profilePage)
+  const changeProfilePage = useUserStore((store) => store.changeProfilePage)
+  const clearUser = useUserStore((state) => state.clearUser)
 
   return (
     <Container>
@@ -33,9 +36,9 @@ export const ProfilePage = () => {
                 <Typography.Text strong>Личный кабинет</Typography.Text>
                 {BUTTONS.map(({ icon, name, title }) => (
                   <Typography.Text
-                    className={selected === name ? styles['profile-filter-selected'] : undefined}
+                    className={profilePage === name ? styles['profile-filter-selected'] : undefined}
                     style={{ cursor: 'pointer' }}
-                    onClick={() => setSelected(name)}
+                    onClick={() => changeProfilePage(name)}
                   >
                     {title}
                   </Typography.Text>
@@ -44,14 +47,25 @@ export const ProfilePage = () => {
                   Добавить книгу
                 </Typography.Text>
 
-                <Typography.Text style={{ cursor: 'pointer' }}>Выйти</Typography.Text>
+                <Typography.Text
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    localStorage.removeItem('token')
+                    clearUser()
+                    navigate('/catalog')
+                  }}
+                >
+                  Выйти
+                </Typography.Text>
               </Flex>
             </Card>
           </Flex>
-          {selected === 'PROFILE' && <UserProfile />}
-          {selected === 'REQUESTS' && <BooksExchanges />}
-          {selected === 'MY_BOOKS' && <MyBooks isFavorite={false} />}
-          {selected === 'FAVORITE' && <MyBooks isFavorite={true} />}
+          {profilePage === 'PROFILE' && <UserProfile />}
+          {profilePage === 'REQUESTS' && <BooksExchanges />}
+          {profilePage === 'RUNNING_REQUESTS' && <BooksExchanges type="running" />}
+          {profilePage === 'ENDED_REQUESTS' && <BooksExchanges type="ended" />}
+          {profilePage === 'MY_BOOKS' && <MyBooks isFavorite={false} />}
+          {profilePage === 'FAVORITE' && <MyBooks isFavorite={true} />}
         </Flex>
       </div>
     </Container>

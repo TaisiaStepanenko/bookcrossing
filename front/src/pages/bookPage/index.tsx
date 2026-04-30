@@ -18,6 +18,8 @@ export const BookPage = () => {
 
   const { data, isLoading } = useGetBook(params?.id || 0)
 
+  console.log(data?.isMy)
+
   if (isLoading || !data)
     return (
       <Flex justify="center" align="center">
@@ -37,7 +39,7 @@ export const BookPage = () => {
             <PhotoGallery photos={data?.photos || []} />
           </Col>
           <BookInfo data={data} />
-          <BookDeliveryInfo data={{ ...data, isMy: false }} setOpen={setOpen} />
+          <BookDeliveryInfo data={data} setOpen={setOpen} />
         </Row>
         <Typography.Title level={5}>Описание</Typography.Title>
         <Typography.Text>{data.description}</Typography.Text>

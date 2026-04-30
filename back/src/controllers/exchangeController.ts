@@ -29,7 +29,7 @@ export const exchangeController = {
                 parsedInfo.offerType, 
                 parsedInfo.offeredBookIds
             );
-            res.status(201).json(exchange);
+            res.status(200).json(exchange);
 
         } catch (error: any) {
             if (error instanceof z.ZodError) {
@@ -57,7 +57,7 @@ export const exchangeController = {
         }
 
         const incomingExchanges = await exchangeService.getIncomingExchanges(ownerId)
-        res.status(201).json(incomingExchanges);
+        res.status(200).json(incomingExchanges);
         } catch (error: any) {
             console.error(error);
             res.status(500).json({ message: error.message || 'Internal server error' });
@@ -89,20 +89,25 @@ export const exchangeController = {
 
     },
 
-    async getAllIncomingExchangesById(req: Request, res: Response) {
+    async getAllExchanges(req: Request, res: Response) {
         try {
-            const ownerId = (req as any).user?.id;
+            const userId = (req as any).user?.id;
 
-            if (!ownerId) {
+            if (!userId) {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
 
-            const bookId = parseInt(req.params.id);
-            if (isNaN(bookId)) {
-                return res.status(400).json({ message: 'Invalid book id' })
+            const type = req.params.type;
+            if ( type !== 'incoming' && type !== 'outcoming' && type !== 'running' && type !== 'ended') {
+                return res.status(400).json({ message: 'Invalid type id' })
             }
 
-            const result = await exchangeService.getIncomingExchangesById(bookId, ownerId);
+            let bookId: number | undefined = undefined;
+            
+            bookId = parseInt(req.params.id);
+                
+
+            const result = await exchangeService.getExchanges( userId, type, bookId);
             res.json(result);
         } catch (error: any) {
             if (error.message === 'Exchange not found') {
@@ -113,35 +118,11 @@ export const exchangeController = {
     },
 
 
-    async cancelBookExchangeById(req: Request, res: Response) {
-        try{
-            const ownerId = (req as any).user?.id;
-
-            if (!ownerId) {
-                return res.status(401).json({ message: 'Unauthorized' });
-            }
-
-            const exchangeId = parseInt(req.params.id);
-            if (isNaN(exchangeId)) {
-                return res.status(400).json({ message: 'Invalid exchange id' });
-            }
-
-            const result = await exchangeService.cancelBookExchangeById(exchangeId, ownerId);
-            res.json(result);
-        } catch (error: any) {
-            if (error.message === 'Exchange not found or already processed') {
-                return res.status(404).json({ message: error.message });
-            }
-            res.status(500).json({ message: error.message });
-        }
-    },
-
-
-    async acceptExchange(req: Request, res: Response) {
+    async changeStatus(req: Request, res: Response) {
         try {
-            const ownerId = (req as any).user?.id;
+            const userId = (req as any).user?.id;
 
-            if (!ownerId) {
+            if (!userId) {
                 return res.status(401).json({ message: 'Unauthorized' });
             }
 
@@ -150,7 +131,12 @@ export const exchangeController = {
                 return res.status(400).json({ message: 'Invalid exchange id' });
             }
 
-            const result = await exchangeService.acceptExchange(exchangeId, ownerId);
+            const {activity, keptBookIds, acceptOffer} = req.body;
+            if (activity != "accept" && activity != "cancel") {
+                return res.status(400).json({ message: 'Invalid activity' });
+            }
+
+            const result = await exchangeService.changeExchangeStatus(exchangeId, userId, activity, keptBookIds);
             res.json(result);
         } catch (error: any) {
             if (error.message === 'Exchange not found or already processed') {

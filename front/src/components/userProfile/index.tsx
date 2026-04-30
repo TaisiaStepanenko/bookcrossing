@@ -1,13 +1,16 @@
+import { useNavigate } from 'react-router-dom'
+
 import { StarFilled, StarOutlined } from '@ant-design/icons'
 
 import { Avatar, Button, Card, Col, Flex, Image, Row, Typography } from 'antd'
 
 import { useGetCities, useGetProfile } from '../../api/hooks'
+import UserImg from '../../assets/userD.jpg'
 
 export const UserProfile = ({ id }: { id?: string }) => {
   const query = useGetProfile(id || '')
   const { data: cities } = useGetCities()
-
+  const navigate = useNavigate()
   const {
     name,
     availableBooks,
@@ -29,8 +32,8 @@ export const UserProfile = ({ id }: { id?: string }) => {
           <Col span={id ? 20 : 24}>
             <Flex gap={'large'} style={{ width: '100%' }}>
               <Flex vertical gap={'small'}>
-                <Image width={285} height={285} />
-                <Button color="default" variant="solid">
+                <Image width={285} height={285} src={UserImg} />
+                <Button color="default" variant="solid" onClick={() => navigate('/profile/edit')}>
                   Редактировать профиль
                 </Button>
               </Flex>
@@ -94,7 +97,7 @@ export const UserProfile = ({ id }: { id?: string }) => {
           <Typography.Text strong>({rating})</Typography.Text>
         </Flex>
         <Flex gap="small">
-          <Typography.Text strong>{reviews} отзывов</Typography.Text>
+          <Typography.Text strong>{reviews?.length} отзывов</Typography.Text>
         </Flex>
       </Flex>
       <Flex vertical gap={'middle'}>

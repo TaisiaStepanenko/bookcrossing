@@ -9,6 +9,7 @@ const router = Router();
 router.post('', bookController.getCatalog);
 router.get('/:id', bookController.getBookById);
 router.post('/favorite/:id', authMiddleware, bookController.addBookToFavorites);
+router.delete('/favorite/:id', authMiddleware, bookController.removeBookFromFavorites);
 
 router.put('/add', authMiddleware, upload.array('photos', 7), bookController.addNewBook);
 router.post('/edit/:id', authMiddleware, upload.array('photos', 7), bookController.updateBookInfo);

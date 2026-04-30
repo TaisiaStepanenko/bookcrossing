@@ -114,68 +114,64 @@ export const exchangeService = {
         return { message: `Rejected ${exchanges} exchange(s)` };
     },
 
-    async getIncomingExchangesById(book_id: number, owner_id: number) {
-        const exchanges = await exchangeRepository.getAllIncomingExchangesById(book_id, owner_id);
-        if (exchanges === 0) {
+    async getExchanges(user_id: number, type: 'incoming' | 'outcoming' | 'running' | 'ended', book_id?: number) {
+        const exchanges = await exchangeRepository.getExchanges( user_id, type, book_id);
+        if (exchanges.length === 0) {
             throw new Error('No exchanges found');
         }
         
 
         return exchanges.map((ex: any) => {
             const initiator = ex.initiator;
+            const owner = ex.owner
             const targetBook = ex.book;
             const offeringBooks = ex.offeringBooks || [];
 
             return {
                 id: ex.transfer_id.toString(),
-                name: initiator?.name || '',
-                avatar: initiator?.photo || null,
+                name: user_id === owner.user_id ? initiator.name : owner.name,
+                avatar: user_id === owner.user_id ? initiator.photo : owner.photo || null,
+                userType: user_id ===owner.user_id ? 'OWNER' : 'INITIATOR',
                 bookCount: ex.offerType,
-                myBook: {
+                ownerBook: {
                     id: targetBook.book_id.toString(),
                     name: targetBook.name || '',
                     src: targetBook.photos?.[0]?.photo_url || ''
                 },
-                userBooks: offeringBooks.map((oBook: any) => ({
+                initiatorBooks: offeringBooks.map((oBook: any) => ({
                     id: oBook.book?.book_id?.toString() || '',
                     name: oBook.book?.name || '',
                     src: oBook.book?.photos?.[0]?.photo_url || ''
-                }))
+                })),
 
-                
+                type: ex.cur_status,
+                currentStatusInitiator: ex.current_status_initiator,
+                currentStatusOwner: ex.current_status_owner
                 
             }
         })
     },
 
 
-    async cancelBookExchangeById(exchange_id: number, owner_id: number) {
-        const exchange = await exchangeRepository.cancelExchangeById(exchange_id, owner_id);
-        if (exchange === 0) {
-            throw new Error('Exchange not found or already processed');
-        }
-        return {message: 'Exchange rejected successfully'};
-    },
 
-
-    async acceptExchange(exchange_id: number, owner_id: number) {
-        const updateExchange = await exchangeRepository.acceptExchange(exchange_id, owner_id);
+    async changeExchangeStatus(exchange_id: number, user_id: number, activity: 'accept' | 'cancel', keptBookIds?: number[], acceptOffer?: number) {
+        const updateExchange = await exchangeRepository.changeStatus(exchange_id, user_id, activity, keptBookIds);
         if (updateExchange === 0) {
             throw new Error('Exchange not found or already processed');
         }
-        console.log(updateExchange)
+        
         
         const exchange = await exchangeRepository.findById(exchange_id);
         if (exchange) {
             await notificationRepository.createNotificstion({ 
-                user_id: owner_id,
-                target_user_id: exchange.initiator_id,
+                user_id: user_id === exchange.owner_id ? exchange.initiator_id : exchange.owner_id,
+                target_user_id: user_id === exchange.owner_id ? exchange.owner_id : exchange.initiator_id,
                 transfer_id: exchange_id,
                 message_type: MessageType.EXCHANGE
             });
         }
 
-        return { message: 'Exchange accepted successfully' }; 
+        return { message: 'Exchange`s status update successfully' }; 
     }
 
     

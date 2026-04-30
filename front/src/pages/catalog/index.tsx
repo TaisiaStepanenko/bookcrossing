@@ -11,9 +11,11 @@ import { conditionOptions, exchangeTypeOptions, placeOptions } from './consts'
 
 export const CatalogPage = () => {
   const cityId = useUserStore((state) => state.user?.cityId)
-  // TODO: добавить фильтры в зустенд
-  const [filters, setFilters] = useState<BooksFilters>({ page: 1, cityId })
-  const { data } = useGetBooks(filters)
+
+  console.log(cityId)
+
+  const [filters, setFilters] = useState<BooksFilters>({ page: 0, place: ['RUSSIA'] })
+  const { data } = useGetBooks({ ...filters, cityId })
 
   const toggleFilter = <T extends string>(current: T[] | undefined, value: T): T[] => {
     if (current?.includes(value)) {
@@ -95,7 +97,7 @@ export const CatalogPage = () => {
                 current={data?.page}
                 total={(data?.totalPages || 1) * 12}
                 pageSize={12}
-                onChange={(page) => setFilters({ cityId, page })}
+                onChange={(page) => setFilters({ ...filters, cityId, page })}
               />
             </Col>
           </Row>

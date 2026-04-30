@@ -139,6 +139,7 @@ export const getUserNotifications = async (user_id: number): Promise<Notificatio
         transferId: n.transfer_id,
         messageType: n.message_type,
         isRead: n.is_read,
-        createdAt: n.created_at
+        createdAt: n.created_at,
+        cur_stutus: n.cur_stutus
     }));
 }

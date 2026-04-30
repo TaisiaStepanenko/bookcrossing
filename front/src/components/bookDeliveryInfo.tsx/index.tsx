@@ -5,11 +5,12 @@ import { HeartOutlined, StarOutlined, UserOutlined } from '@ant-design/icons'
 import { Avatar, Button, Card, Col, Divider, Flex, Typography } from 'antd'
 import dayjs from 'dayjs'
 
-import { useAddFavorite, useDeleteBook } from '../../api/hooks'
+import { useAddFavorite, useDeleteBook, useRemoveFavorite } from '../../api/hooks'
 import type { Book } from '../../api/models'
 
 export const BookDeliveryInfo = ({ data, setOpen }: { data: Book; setOpen: (open: boolean) => void }) => {
   const addFavorite = useAddFavorite()
+  const removeFavorite = useRemoveFavorite()
   const navigate = useNavigate()
   const { mutateAsync } = useDeleteBook()
 
@@ -25,6 +26,14 @@ export const BookDeliveryInfo = ({ data, setOpen }: { data: Book; setOpen: (open
     mutateAsync({ id: data.bookId }).finally(() => navigate('/catalog'))
   }
 
+  const handleFavorite = () => {
+    if (data.isFavorite) {
+      removeFavorite.mutateAsync(data.bookId)
+    } else {
+      addFavorite.mutateAsync(data.bookId)
+    }
+  }
+
   return (
     <Col span={6}>
       <Flex gap="small" vertical>
@@ -38,12 +47,7 @@ export const BookDeliveryInfo = ({ data, setOpen }: { data: Book; setOpen: (open
                   <Button color="default" variant="solid" onClick={() => setOpen(true)}>
                     Предложить обмен
                   </Button>
-                  <Button
-                    color="default"
-                    variant="text"
-                    icon={<HeartOutlined />}
-                    onClick={() => addFavorite.mutateAsync(bookId)}
-                  />
+                  <Button color="default" variant="text" icon={<HeartOutlined />} onClick={handleFavorite} />
                 </Flex>
               </Flex>
               <Divider />

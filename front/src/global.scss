@@ -49,6 +49,7 @@
 
 html {
   box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 *,
@@ -63,4 +64,9 @@ html {
 
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
+}
+
+img {
+  object-fit: contain;
+  // background-color: #72a56124
 }

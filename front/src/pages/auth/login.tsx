@@ -42,7 +42,15 @@ export const LoginPage = () => {
     } else {
       validateEmail(email)
       setIsError('')
-      login.mutateAsync(data)
+      login
+        .mutateAsync(data)
+        .then((response) => {
+          localStorage.setItem('token', response.token) // сохраняем токен
+          navigate('/catalog') // перенаправление
+        })
+        .catch((error) => {
+          // обработка ошибки уже есть
+        })
     }
   }
 

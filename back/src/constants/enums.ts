@@ -50,7 +50,7 @@ export enum TransferStatus  {
     SENT = 'SENT',                                  
     RECEIVED = 'RECEIVED',                          
     COMPLETED_SUCCESS = 'COMPLETED_SUCCESS',         
-    COMPLETED_PREMATUREY = 'COMPLETED_PREMATURELY'    
+    COMPLETED_PREMATURELY = 'COMPLETED_PREMATURELY'    
 };
 
 export enum OfferType  {
@@ -63,6 +63,18 @@ export enum MessageType  {
     EXCHANGE = 'EXCHANGE',
     REVIEW =  'REVIEW'  
 };
+
+export const STATUS_TABS: Record<TransferStatus, 'NEW' | 'RUNNIG' | 'ENDED'> = {
+    WAITING_RESPONSE: 'NEW',           
+    WAITING_CONFIRMATION: 'NEW',   
+    WAITING_TO_BE_SENT: 'RUNNIG',      
+    SENT: 'RUNNIG',                                  
+    RECEIVED: 'RUNNIG',    
+    COMPLETED_PREMATURELY: 'ENDED',    
+    COMPLETED_SUCCESS: 'ENDED',         
+    CANCELLED: 'ENDED',                        
+
+}
 
 
 export const BookConditionValues = Object.values(BookCondition);

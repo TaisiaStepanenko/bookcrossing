@@ -3,7 +3,8 @@ import { getUserInfo, getUserProfile, updateUserProfile, getUserNotifications} f
 import { z } from 'zod';
 import { error } from "console";
 import { verifyToken } from "../utils/jwt";
-import { ta } from "zod/v4/locales";
+import { userRepository } from "../repositories/userRepository";
+import { deletePhotoFromDish } from "../utils/fs";
 
 const updateProfileSchema = z.object({
     name: z.string().optional(),
@@ -56,6 +57,18 @@ export const userController = {
         try {
             const userId = (req as any).user.id;
             const validateInfo = updateProfileSchema.parse(req.body);
+            
+            if (req.file) {
+                const user = await userRepository.findProfileInfo(userId);
+                if (user?.photo) {
+                    deletePhotoFromDish(user.photo); 
+                }
+                
+                validateInfo.photo = `/uploads/${req.file.filename}`;
+            }
+
+            
+
             const update = await updateUserProfile(userId, validateInfo);
             res.json(update);
         } catch (error: any) {
