@@ -44,15 +44,15 @@ export const bookEditSchema = z.object({
 export const bookController = {
     async getCatalog(req: Request, res: Response) {
         try {
+            let userId: number | undefined;
             const authHeader = req.headers.authorization;
-            if (!authHeader) {
-                return res.status(401).json({ message: 'No token provided' });
+            if (authHeader) {
+                try {
+                    const token = authHeader.split(' ')[1];
+                    const decoded: any = verifyToken(token);
+                    userId = decoded.id;
+                } catch {}
             }
-
-            const token = authHeader.split(' ')[1];
-            const decoded: any = verifyToken(token);
-            
-            const userId = decoded.id
 
             const parsed = catalogFilterSchema.parse(req.body);
 

@@ -102,9 +102,11 @@ export const exchangeController = {
                 return res.status(400).json({ message: 'Invalid type id' })
             }
 
-            let bookId: number | undefined = undefined;
-            
-            bookId = parseInt(req.params.id);
+            let bookId: number | undefined;
+            if (req.params.id) {
+                bookId = parseInt(req.params.id);
+                if (isNaN(bookId)) return res.status(400).json({ message: 'Invalid book id' });
+            }
                 
 
             const result = await exchangeService.getExchanges( userId, type, bookId);

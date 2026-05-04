@@ -64,12 +64,12 @@ export enum MessageType  {
     REVIEW =  'REVIEW'  
 };
 
-export const STATUS_TABS: Record<TransferStatus, 'NEW' | 'RUNNIG' | 'ENDED'> = {
+export const STATUS_TABS: Record<TransferStatus, 'NEW' | 'RUNNING' | 'ENDED'> = {
     WAITING_RESPONSE: 'NEW',           
     WAITING_CONFIRMATION: 'NEW',   
-    WAITING_TO_BE_SENT: 'RUNNIG',      
-    SENT: 'RUNNIG',                                  
-    RECEIVED: 'RUNNIG',    
+    WAITING_TO_BE_SENT: 'RUNNING',      
+    SENT: 'RUNNING',                                  
+    RECEIVED: 'RUNNING',    
     COMPLETED_PREMATURELY: 'ENDED',    
     COMPLETED_SUCCESS: 'ENDED',         
     CANCELLED: 'ENDED',                        

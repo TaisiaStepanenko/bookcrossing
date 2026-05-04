@@ -47,6 +47,19 @@ export const exchangeService = {
 
         await exchangeRepository.addOfferingBooks(exchange.transfer_id, offeredBooksIds);
 
+        
+        await Book.update(
+            { status: BookStatus.IN_EXCHANGE },
+            { where: { book_id: book_id } }
+        );
+
+        if (offeredBooksIds.length > 0) {
+            await Book.update(
+                { status: BookStatus.IN_EXCHANGE },
+                { where: { book_id: { [Op.in]: offeredBooksIds } } }
+            );
+        }
+
         await notificationService.createNotification({
             user_id: init_user_id,
             target_user_id: book.owner_id,

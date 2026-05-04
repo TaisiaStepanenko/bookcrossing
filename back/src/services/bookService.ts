@@ -71,8 +71,15 @@ export const bookService = {
 
         
 
-        if (bookInfo.photos && bookInfo.photos.length > 0) {
-            await BookRepository.addBookPhoto(book_id, bookInfo.photos);
+        if (bookInfo.photos?.length) {
+            const maxOrder: number = await BookPhoto.max('sort_order', { where: { book_id } }) || 0;
+            const newPhotos = bookInfo.photos.map((p, i) => ({
+                book_id,
+                photo_url: p.url,
+                is_main: false,
+                sort_order: maxOrder + i + 1
+            }));
+            await BookPhoto.bulkCreate(newPhotos);
         }
 
         const allPhotos = await BookPhoto.findAll({
@@ -81,10 +88,10 @@ export const bookService = {
         });
 
         if (allPhotos.length > 0) {
-        for (let i = allPhotos.length; i > 0; i--) {
-            await allPhotos[i - 1].update({
-                sort_order: allPhotos.length - i,
-                is_main: allPhotos.length - i === 0  
+        for (let i = 0; i < allPhotos.length; i++) {
+            await allPhotos[i].update({
+                sort_order: i,
+                is_main: i === 0
             });
         }
     }
@@ -103,6 +110,9 @@ export const bookService = {
         if (bookOwner.owner_id !== user_id) {
             throw new Error('Forbidden');
         }
+
+        const photos = await BookPhoto.findAll({ where: { book_id } });
+        photos.forEach(p => deletePhotoFromDish(p.photo_url));
 
         const deletedCount = await BookRepository.deleteBook(book_id);
         if (deletedCount === 0) {

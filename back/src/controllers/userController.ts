@@ -58,18 +58,27 @@ export const userController = {
             const userId = (req as any).user.id;
             const validateInfo = updateProfileSchema.parse(req.body);
             
+            const updates = {
+                name: validateInfo.name,
+                email: validateInfo.email,
+                phone: validateInfo.phone,
+                city_id: validateInfo.cityId,
+                birthday_date: validateInfo.birthdayDate,
+                photo: validateInfo.photo,
+                description: validateInfo.description
+            };
+
             if (req.file) {
                 const user = await userRepository.findProfileInfo(userId);
                 if (user?.photo) {
-                    deletePhotoFromDish(user.photo); 
+                    deletePhotoFromDish(user.photo);
                 }
-                
-                validateInfo.photo = `/uploads/${req.file.filename}`;
+                updates.photo = `/uploads/${req.file.filename}`;
             }
 
             
 
-            const update = await updateUserProfile(userId, validateInfo);
+            const update = await updateUserProfile(userId, updates);
             res.json(update);
         } catch (error: any) {
             res.status(400).json({errors: error.errors});

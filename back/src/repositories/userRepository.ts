@@ -3,6 +3,7 @@ import {ExchangeType, ExchangeMethod, TransferStatus} from '../constants/enums';
 import {BookCatalogItem} from './bookRepository';
 import {notificationRepository} from './notificationRepository';
 import {STATUS_TABS} from '../constants/enums';
+import { Op } from 'sequelize';
 
 
 
@@ -51,7 +52,14 @@ export const userRepository = {
 
     async getUserStats(user_id: number) {
         const reviewNumber = await Review.count({where: {reviewed_user_id: user_id}});
-        const completedExchanges = await Transfer.count({where: {cur_status: TransferStatus.COMPLETED_SUCCESS}});
+        const completedExchanges = await Transfer.count({
+        where: {
+            cur_status: TransferStatus.COMPLETED_SUCCESS,
+            [Op.or]: [
+                { owner_id: user_id },
+                { initiator_id: user_id }
+            ]
+        }});
         const availableBooks = await Book.count({where: {owner_id: user_id, status: 'AVAILABLE'}});
 
         return {reviewNumber, completedExchanges, availableBooks};
