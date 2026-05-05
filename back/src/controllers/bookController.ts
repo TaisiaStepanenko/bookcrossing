@@ -3,8 +3,6 @@ import { Request, Response } from 'express';
 import { bookService } from '../services/bookService';
 import { Place, ExchangeMethod, BookCondition, ExchangeType, BookCover } from '../constants/enums';
 import { verifyToken } from '../utils/jwt';
-import { url } from 'inspector';
-import { ur } from 'zod/v4/locales';
 
 const catalogFilterSchema = z.object({
     cityId: z.number().int().positive().optional(),

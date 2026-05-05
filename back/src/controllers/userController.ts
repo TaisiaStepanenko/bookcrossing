@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { getUserInfo, getUserProfile, updateUserProfile, getUserNotifications} from '../services/userService'
 import { z } from 'zod';
-import { error } from "console";
 import { verifyToken } from "../utils/jwt";
 import { userRepository } from "../repositories/userRepository";
 import { deletePhotoFromDish } from "../utils/fs";
@@ -88,7 +87,9 @@ export const userController = {
     async getNotifications(req: Request, res: Response) {
         try {
             const userId = (req as any).user.id;
-            const notifications = await getUserNotifications(userId);
+            const page = parseInt(req.query.page as string) || 1;
+            const limit = parseInt(req.query.limit as string) || 20;
+            const notifications = await getUserNotifications(userId, page, limit);
             res.json(notifications);
         } catch (error: any) {
             res.status(404).json({message: error.message});

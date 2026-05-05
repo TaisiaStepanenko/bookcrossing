@@ -13,17 +13,21 @@ export const notificationRepository = {
         return Notification.create(data)
     },
 
-    async findByTargetUser(target_user_id: number): Promise<(Notification & {initiator: User, transfer: Transfer})[]>{
+    async findByTargetUser(target_user_id: number, limit: number, offset: number): Promise<{ notifications: Notification[], total: number }> {
 
 
-        return Notification.findAll({
+        const {rows, count} = await Notification.findAndCountAll({
             where: { target_user_id },
             include: [
                 { model: User, as: 'initiator', attributes: ['name'] },
                 { model: Transfer, as: 'transfer', attributes: ['cur_status']}
             ],
-            order: [['created_at', 'DESC']]
-        }) as any;  
+            order: [['created_at', 'DESC']],
+            limit: limit,      
+            offset: offset
+        });
+        
+        return {notifications: rows, total: count};
     },
 
     async markAsRead(notification_id: number, target_user_id: number) {

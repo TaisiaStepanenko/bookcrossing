@@ -1,4 +1,3 @@
-import { number } from "zod/v4";
 import { OfferType, TransferStatus, BookStatus } from "../constants/enums";
 import { Book, BookPhoto, OfferingBook, Transfer, User } from "../models";
 import { Op } from "sequelize";
@@ -47,10 +46,45 @@ export const exchangeRepository = {
     },
 
     async cancelAllBookExchanges(book_id: number, owner_id: number): Promise<number> {
+
+        const pendingTransfers = await Transfer.findAll({
+            where: {
+                book_id: book_id,
+                owner_id: owner_id,
+                current_status_owner: TransferStatus.WAITING_RESPONSE
+            },
+            include: [{ model: OfferingBook, as: 'offeringBooks' }]
+        });
+
+        if (pendingTransfers.length === 0) return 0;
+
         const [affectedCount] = await Transfer.update(
             {current_status_owner: TransferStatus.CANCELLED, current_status_initiator: TransferStatus.CANCELLED, cur_status: TransferStatus.CANCELLED},
             { where: {book_id: book_id, owner_id: owner_id, current_status_owner: TransferStatus.WAITING_RESPONSE}},
         )
+
+        await Book.update(
+            { status: BookStatus.AVAILABLE },
+            { where: { book_id: book_id } }
+        );
+
+        const offeredBookIds: number[] = [];
+        for (const transfer of pendingTransfers) {
+            const offeredBooks = await OfferingBook.findAll({
+                where: {transfer_id: transfer.transfer_id}
+            });
+            if (offeredBooks.length !== 0) {
+                for (const ob of offeredBooks) {
+                    offeredBookIds.push(ob.book_id);
+                }
+            }  
+        }
+        if (offeredBookIds.length > 0) {
+            await Book.update(
+                { status: BookStatus.AVAILABLE },
+                { where: { book_id: { [Op.in]: offeredBookIds } } }
+            );
+        }
 
         return affectedCount;
     },
@@ -58,14 +92,13 @@ export const exchangeRepository = {
     
     
     
-    async changeStatus(exchange_id: number, user_id: number, activity: 'accept' | 'cancel', keptBookIds?: number[]) {
-
+    async changeStatus(exchange_id: number, user_id: number, activity: 'accept' | 'cancel', keptBookIds?: number[]): Promise<boolean> {
         const exchange = await Transfer.findByPk(exchange_id);
-        let affectedCount: number | undefined = 0;
+        if (!exchange) return false;
 
         if (activity === 'accept') {
-            if (exchange?.cur_status === TransferStatus.WAITING_RESPONSE) {
-                [affectedCount] = await Transfer.update(
+            if (exchange.cur_status === TransferStatus.WAITING_RESPONSE) {
+                await Transfer.update(
                     { current_status_owner: TransferStatus.WAITING_CONFIRMATION, current_status_initiator: TransferStatus.WAITING_CONFIRMATION, cur_status: TransferStatus.WAITING_CONFIRMATION },
                     { where: { transfer_id: exchange_id } }
                 );
@@ -73,20 +106,21 @@ export const exchangeRepository = {
                     await this.deleteOfferingBooks(exchange_id, keptBookIds);
                 }
                 await this.deleteOtherOffers(exchange.book_id, exchange_id);
-
-            } else if (exchange?.cur_status === TransferStatus.WAITING_CONFIRMATION) {
-                [affectedCount] = await Transfer.update(
+            } 
+            else if (exchange.cur_status === TransferStatus.WAITING_CONFIRMATION) {
+                await Transfer.update(
                     { current_status_owner: TransferStatus.WAITING_TO_BE_SENT, current_status_initiator: TransferStatus.WAITING_TO_BE_SENT, cur_status: TransferStatus.WAITING_TO_BE_SENT },
                     { where: { transfer_id: exchange_id } }
                 );
-            } else if (exchange?.cur_status === TransferStatus.WAITING_TO_BE_SENT) {
+            } 
+            else if (exchange.cur_status === TransferStatus.WAITING_TO_BE_SENT) {
                 if (exchange.owner_id === user_id) {
-                    [affectedCount] = await Transfer.update(
+                    await Transfer.update(
                         { current_status_owner: TransferStatus.SENT },
                         { where: { transfer_id: exchange_id, owner_id: user_id } }
                     );
                 } else if (exchange.initiator_id === user_id) {
-                    [affectedCount] = await Transfer.update(
+                    await Transfer.update(
                         { current_status_initiator: TransferStatus.SENT },
                         { where: { transfer_id: exchange_id, initiator_id: user_id } }
                     );
@@ -94,20 +128,20 @@ export const exchangeRepository = {
 
                 const updatedExchange = await Transfer.findByPk(exchange_id);
                 if (updatedExchange?.current_status_initiator === TransferStatus.SENT && updatedExchange?.current_status_owner === TransferStatus.SENT) {
-                    [affectedCount] = await Transfer.update(
+                    await Transfer.update(
                         { cur_status: TransferStatus.SENT },
                         { where: { transfer_id: exchange_id } }
                     );
                 }
-
-            } else if (exchange?.cur_status === TransferStatus.SENT) {
+            } 
+            else if (exchange.cur_status === TransferStatus.SENT) {
                 if (exchange.owner_id === user_id) {
-                    [affectedCount] = await Transfer.update(
+                    await Transfer.update(
                         { current_status_owner: TransferStatus.RECEIVED },
                         { where: { transfer_id: exchange_id, owner_id: user_id } }
                     );
                 } else if (exchange.initiator_id === user_id) {
-                    [affectedCount] = await Transfer.update(
+                    await Transfer.update(
                         { current_status_initiator: TransferStatus.RECEIVED },
                         { where: { transfer_id: exchange_id, initiator_id: user_id } }
                     );
@@ -115,8 +149,7 @@ export const exchangeRepository = {
 
                 const updatedExchange = await Transfer.findByPk(exchange_id);
                 if (updatedExchange?.current_status_initiator === TransferStatus.RECEIVED && updatedExchange?.current_status_owner === TransferStatus.RECEIVED) {
-                    
-                    [affectedCount] = await Transfer.update(
+                    await Transfer.update(
                         {
                             current_status_initiator: TransferStatus.COMPLETED_SUCCESS,
                             current_status_owner: TransferStatus.COMPLETED_SUCCESS,
@@ -124,16 +157,11 @@ export const exchangeRepository = {
                         },
                         { where: { transfer_id: exchange_id } }
                     );
-
                     await Book.update(
                         { owner_id: exchange.initiator_id, status: BookStatus.EXCHANGED },
                         { where: { book_id: exchange.book_id } }
                     );
-
-                    
-                    const offeringBooks = await OfferingBook.findAll({
-                        where: { transfer_id: exchange_id }
-                    });
+                    const offeringBooks = await OfferingBook.findAll({ where: { transfer_id: exchange_id } });
                     const offeredBookIds = offeringBooks.map(ob => ob.book_id);
                     if (offeredBookIds.length > 0) {
                         await Book.update(
@@ -143,23 +171,18 @@ export const exchangeRepository = {
                     }
                 }
             }
-
-        } else if (activity === 'cancel') {
-            if (exchange?.cur_status === TransferStatus.WAITING_RESPONSE || exchange?.cur_status === TransferStatus.WAITING_CONFIRMATION) {
-                [affectedCount] = await Transfer.update(
+        } 
+        else if (activity === 'cancel') {
+            if (exchange.cur_status === TransferStatus.WAITING_RESPONSE || exchange.cur_status === TransferStatus.WAITING_CONFIRMATION) {
+                await Transfer.update(
                     { current_status_owner: TransferStatus.CANCELLED, current_status_initiator: TransferStatus.CANCELLED, cur_status: TransferStatus.CANCELLED },
                     { where: { transfer_id: exchange_id } }
                 );
-
-                // Возвращаем книгам статус AVAILABLE
                 await Book.update(
                     { status: BookStatus.AVAILABLE },
                     { where: { book_id: exchange.book_id } }
                 );
-
-                const offeringBooks = await OfferingBook.findAll({
-                    where: { transfer_id: exchange_id }
-                });
+                const offeringBooks = await OfferingBook.findAll({ where: { transfer_id: exchange_id } });
                 const offeredBookIds = offeringBooks.map(ob => ob.book_id);
                 if (offeredBookIds.length > 0) {
                     await Book.update(
@@ -167,22 +190,17 @@ export const exchangeRepository = {
                         { where: { book_id: { [Op.in]: offeredBookIds } } }
                     );
                 }
-
-            } else if (exchange?.cur_status === TransferStatus.WAITING_TO_BE_SENT || exchange?.cur_status === TransferStatus.SENT) {
-                [affectedCount] = await Transfer.update(
+            } 
+            else if (exchange.cur_status === TransferStatus.WAITING_TO_BE_SENT || exchange.cur_status === TransferStatus.SENT) {
+                await Transfer.update(
                     { current_status_owner: TransferStatus.COMPLETED_PREMATURELY, current_status_initiator: TransferStatus.COMPLETED_PREMATURELY, cur_status: TransferStatus.COMPLETED_PREMATURELY },
                     { where: { transfer_id: exchange_id } }
                 );
-
                 await Book.update(
                     { status: BookStatus.AVAILABLE },
                     { where: { book_id: exchange.book_id } }
                 );
-
-               
-                const offeringBooks = await OfferingBook.findAll({
-                    where: { transfer_id: exchange_id }
-                });
+                const offeringBooks = await OfferingBook.findAll({ where: { transfer_id: exchange_id } });
                 const offeredBookIds = offeringBooks.map(ob => ob.book_id);
                 if (offeredBookIds.length > 0) {
                     await Book.update(
@@ -192,9 +210,8 @@ export const exchangeRepository = {
                 }
             }
         }
-
-        return affectedCount;
-    },
+        return true;
+    },   
 
     async deleteOfferingBooks( exchange_id: number, keptBookIds: number[]) {
         
@@ -207,6 +224,35 @@ export const exchangeRepository = {
     },
 
     async deleteOtherOffers(book_id: number, acceptOffer: number) {
+
+        const otherTransfers = await Transfer.findAll({
+            where: {
+                book_id: book_id,
+                transfer_id: { [Op.notIn]: [acceptOffer] }
+            },
+            include: [{ model: OfferingBook, as: 'offeringBooks' }]
+        }); 
+
+        if (otherTransfers.length === 0) return;
+
+        const offeredBookIds: number[] = [];
+        for (const transfer of otherTransfers) {
+            const offeredBooks = await OfferingBook.findAll({
+                where: {transfer_id: transfer.transfer_id}
+            });
+            if (offeredBooks) {
+                for (const ob of offeredBooks) {
+                    offeredBookIds.push(ob.book_id);
+                }
+            }
+        }
+
+        if (offeredBookIds.length > 0) {
+        await Book.update(
+            { status: BookStatus.AVAILABLE },
+            { where: { book_id: { [Op.in]: offeredBookIds } } }
+        );
+    }
          
         await Transfer.destroy({
             where: {

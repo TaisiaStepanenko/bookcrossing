@@ -2,8 +2,6 @@ import { Request, Response } from "express";
 import {z} from 'zod';
 import { OfferType } from "../constants/enums";
 import { exchangeService } from "../services/exchangeService";
-import { json } from "sequelize";
-import { tr } from "zod/v4/locales";
 
 const createExchangeSchema = z.object({
     targetBookId: z.number().int().positive(),

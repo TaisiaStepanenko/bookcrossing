@@ -129,9 +129,6 @@ export const exchangeService = {
 
     async getExchanges(user_id: number, type: 'incoming' | 'outcoming' | 'running' | 'ended', book_id?: number) {
         const exchanges = await exchangeRepository.getExchanges( user_id, type, book_id);
-        if (exchanges.length === 0) {
-            throw new Error('No exchanges found');
-        }
         
 
         return exchanges.map((ex: any) => {
@@ -168,9 +165,9 @@ export const exchangeService = {
 
 
     async changeExchangeStatus(exchange_id: number, user_id: number, activity: 'accept' | 'cancel', keptBookIds?: number[], acceptOffer?: number) {
-        const updateExchange = await exchangeRepository.changeStatus(exchange_id, user_id, activity, keptBookIds);
-        if (updateExchange === 0) {
-            throw new Error('Exchange not found or already processed');
+        const success = await exchangeRepository.changeStatus(exchange_id, user_id, activity, keptBookIds);
+        if (!success) {
+            throw new Error('Exchange not found');
         }
         
         

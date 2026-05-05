@@ -53,7 +53,7 @@ export const reviewService = {
             comment: comment || null
         })
 
-        await this.countRating(user_id);
+        await this.countRating(reviewedUserId);
 
         await notificationService.createNotification({
             user_id: user_id,                      

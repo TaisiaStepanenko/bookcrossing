@@ -110,12 +110,10 @@ interface UpdateProfileBody  {
 }
 
 export const updateUserProfile = async (user_id: number, updates: UpdateProfileBody) => {
-    const updatedUser = await userRepository.updateProfileInfo(user_id, updates);
-    if (!updatedUser) {
+    const [affectedCount] = await userRepository.updateProfileInfo(user_id, updates);
+    if (affectedCount === 0) {
         throw new Error('User not found or update failed');
     }
-
-
     return getUserProfile(user_id);
 }
 
@@ -129,17 +127,6 @@ interface NotificationResponse {
     createdAt: string;
 }
 
-export const getUserNotifications = async (user_id: number): Promise<NotificationResponse[]> => {
-    const notifications = await userRepository.getNotifications(user_id);
-
-    return notifications.map(n => ({
-        notificationId: n.notification_id,
-        userId: n.user_id,
-        userName: n.user_name,
-        transferId: n.transfer_id,
-        messageType: n.message_type,
-        isRead: n.is_read,
-        createdAt: n.created_at,
-        cur_stutus: n.cur_stutus
-    }));
+export const getUserNotifications = async (user_id: number, page: number = 1, limit: number = 20) => {
+    return await userRepository.getNotifications(user_id, page, limit);
 }

@@ -123,21 +123,26 @@ export const userRepository = {
 
     },
 
-    async getNotifications(user_id: number) {
-        const notifications = await notificationRepository.findByTargetUser(user_id);
+    async getNotifications(user_id: number, page: number = 1, limit: number = 20) {
+        const offset = (page - 1) * limit;
+        const {notifications, total} = await notificationRepository.findByTargetUser(user_id, limit, offset);
         
 
-        return notifications.map((n) => ({
-            notification_id: n.notification_id,
-            user_id: n.user_id,                  
-            user_name: n.initiator?.name || '',
-            transfer_id: n.transfer_id,
-            message_type: n.message_type,
-            is_read: n.is_read,
-            created_at: n.created_at,
-            cur_stutus: STATUS_TABS[n.transfer.cur_status]
-            
-        }));
+        return {
+            items: notifications.map((n: any) => ({
+                notification_id: n.notification_id,
+                user_id: n.user_id,                  
+                user_name: n.initiator?.name || '',
+                transfer_id: n.transfer_id,
+                message_type: n.message_type,
+                is_read: n.is_read,
+                created_at: n.created_at,
+                cur_stutus: STATUS_TABS[n.transfer.cur_status as TransferStatus]
+            })),
+            totaltem: total,
+            totalPages: Math.ceil(total/limit),
+            currentPage: page
+        }
     },
 
     async incrementNotifications(user_id: number): Promise<void> {
