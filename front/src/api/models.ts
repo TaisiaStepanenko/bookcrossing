@@ -56,6 +56,7 @@ export interface BooksFilters {
   page: number
   myBook?: boolean
   favorite?: boolean
+  search?: string
 }
 
 export interface BooksCatalog {
@@ -83,7 +84,7 @@ export interface Book {
   author: string
   condition: BookCondition
   defects: string
-  genre: string
+  genre: string[]
   cover: BookCover
   bookId: number
   isFavorite: boolean
@@ -97,12 +98,12 @@ export interface Book {
   isMy: boolean
   userInfo: {
     shortName: string
-    city: string
+    city: number
     name: string
     avatar: string
-    userId: string
-    raiting: string
-    feedbacksNumbe: number
+    userId: number
+    raiting: number
+    reviewNumber: number
     registrationDate: string
   }
 }
@@ -153,7 +154,7 @@ export interface BookEdit {
   exchangeMethod?: string // "MEETING"
   condition?: string // "EXCELLENT"
   defects?: string // ""
-  genre?: string // "Роман"
+  genre?: string[] // "Роман"
   cover?: string // "HARDCOVER"
   publisherHouse?: string // "Эксмо"
   year?: number // 2023

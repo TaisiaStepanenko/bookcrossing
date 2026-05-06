@@ -18,6 +18,7 @@ export interface BookFilter {
     page: number;
     myBook?: boolean;
     isFavorite?: boolean;
+    search?: string
 }
 
 
@@ -43,7 +44,7 @@ export interface BookEdit {
     author: string;
     condition: BookCondition;
     defects: string;
-    genre: string;
+    genre: string | string[];
     cover: BookCover;
     publisherHouse?: string | null;
     year?: number | 0;
@@ -97,6 +98,13 @@ export const BookRepository = {
 
         if (filter.exchange && filter.exchange.length > 0) {
             where.exchangeType = { [Op.in]: filter.exchange };
+        }
+
+        if (filter.search && filter.search?.length > 0) {
+            where[Op.or] = [
+                { name: { [Op.iLike]: `%${filter.search}%` } },
+                { author: { [Op.iLike]: `%${filter.search}%` } }
+            ];
         }
 
         where.status = 'AVAILABLE';
@@ -164,7 +172,6 @@ export const BookRepository = {
             const mainPhoto = book.photos?.[0];
 
             let isFavorite = false;
-            console.log(book)
             if (user_id && book.favorites) {
                 isFavorite = Array.isArray(book.favorites)
                     ? book.favorites.some((f: any) => f.user_id === user_id)
@@ -226,11 +233,10 @@ export const BookRepository = {
         }
 
         const book = await Book.findByPk(book_id, { include });
-
         if (!book) return null;
 
         const photos = book.get('photos') as BookPhoto[] || [];
-
+        
 
 
         let fav;
@@ -248,7 +254,7 @@ export const BookRepository = {
 
         
         const isMyBook = user_id && user_id === owner?.user_id
-console.log(user_id, owner?.user_id)
+
         return {
             bookId: book.book_id,
             photos: (photos).map((p: any) => ({
@@ -261,7 +267,7 @@ console.log(user_id, owner?.user_id)
             author: book.author,
             condition: book.condition,
             defects: book.defects || '',
-            genre: book.genre,
+            genre: book.genre ? book.genre.split(',') : [],
             cover: book.cover,
             isFavorite: user_id ? fav : false,
             publisherHouse: book.publishing_house || '',
@@ -352,7 +358,7 @@ console.log(user_id, owner?.user_id)
         user_id: number,
         book_id: number
     }): Promise<boolean> {
-
+        if (!data.user_id) return false;
         const favorite = await Favorite.findOne({
             where: { user_id: data.user_id, book_id: data.book_id }
         });
@@ -378,7 +384,7 @@ console.log(user_id, owner?.user_id)
         return await Book.create({
             name: data.name,
             author: data.author,
-            genre: data.genre,
+            genre: Array.isArray(data.genre) ? data.genre.join(',') : data.genre,
             cover: data.cover,
             publishing_house: data.publisherHouse,
             year: data.year,
@@ -396,30 +402,27 @@ console.log(user_id, owner?.user_id)
     async updateBookInfo(book_id: number, data: BookEdit) {
         return await Book.update(
             {
-            name: data.name,
-            author: data.author,
-            genre: data.genre,
-            cover: data.cover,
-            publishing_house: data.publisherHouse,
-            year: data.year,
-            series: data.series,
-            description: data.description,
-            condition: data.condition,
-            defects: data.defects,
-            exchangeMethod: data.exchangeMethod,
-            exchangeType: data.exchangeType,
-            obtaining_methods: data.obtainingMethod,
-            
-            }, {
-            where: {book_id: book_id},
-            returning: true,
-
-        });
+                name: data.name,
+                author: data.author,
+                genre: Array.isArray(data.genre) ? data.genre.join(',') : data.genre,              
+                cover: data.cover,
+                publishing_house: data.publisherHouse,
+                year: data.year,
+                series: data.series,
+                description: data.description,
+                condition: data.condition,
+                defects: data.defects,
+                exchangeMethod: data.exchangeMethod,
+                exchangeType: data.exchangeType,
+                obtaining_methods: data.obtainingMethod,
+            },
+            { where: { book_id: book_id }, returning: true }
+        );
     },
 
-   async deleteBook(book_id: number): Promise<number> {
-    return Book.destroy({ where: { book_id } });
-}
+    async deleteBook(book_id: number): Promise<number> {
+        return Book.destroy({ where: { book_id } });
+    }
    
 
 

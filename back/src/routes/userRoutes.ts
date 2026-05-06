@@ -8,7 +8,7 @@ const router = Router();
 
 
 
-router.get('/info', userController.getInfo);
+router.get('/info', authMiddleware, userController.getInfo);
 router.get('/profile/:id?', userController.getProfile);
 router.post('/profile', authMiddleware, upload.single('avatar'), userController.updateProfile);
 router.get('/notifications', authMiddleware, userController.getNotifications);          

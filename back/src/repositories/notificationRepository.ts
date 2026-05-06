@@ -4,7 +4,7 @@ import { Notification, User, Transfer } from '../models';
 
 export const notificationRepository = {
 
-    async createNotificstion( data: {
+    async createNotification( data: {
         user_id: number;
         target_user_id: number;
         transfer_id: number;

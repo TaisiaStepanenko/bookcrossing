@@ -18,8 +18,6 @@ export const BookPage = () => {
 
   const { data, isLoading } = useGetBook(params?.id || 0)
 
-  console.log(data?.isMy)
-
   if (isLoading || !data)
     return (
       <Flex justify="center" align="center">

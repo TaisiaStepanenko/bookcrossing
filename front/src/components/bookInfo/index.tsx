@@ -19,8 +19,8 @@ export const BookInfo = ({ data }: { data: Book }) => (
         <Typography.Text>{data.defects}</Typography.Text>
       </Flex>
       <Flex justify="space-between">
-        <Typography.Text disabled>Вид книги</Typography.Text>
-        <Typography.Text>{data.genre}</Typography.Text>
+        <Typography.Text disabled>Жанр</Typography.Text>
+        <Typography.Text>{data.genre.join(', ')}</Typography.Text>
       </Flex>
       <Flex justify="space-between">
         <Typography.Text disabled>Тип обложки</Typography.Text>

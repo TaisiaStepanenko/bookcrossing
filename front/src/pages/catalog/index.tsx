@@ -12,10 +12,13 @@ import { conditionOptions, exchangeTypeOptions, placeOptions } from './consts'
 export const CatalogPage = () => {
   const cityId = useUserStore((state) => state.user?.cityId)
 
-  console.log(cityId)
-
+  const search = useUserStore((state) => state.search)
   const [filters, setFilters] = useState<BooksFilters>({ page: 0, place: ['RUSSIA'] })
-  const { data } = useGetBooks({ ...filters, cityId })
+  const { data } = useGetBooks({
+    ...filters,
+    cityId,
+    search,
+  })
 
   const toggleFilter = <T extends string>(current: T[] | undefined, value: T): T[] => {
     if (current?.includes(value)) {

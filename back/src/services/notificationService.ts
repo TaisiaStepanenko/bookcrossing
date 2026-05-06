@@ -12,7 +12,7 @@ export const notificationService = {
         transfer_id: number;
         message_type: MessageType;
     }) {
-        const notifications = await notificationRepository.createNotificstion(data);
+        const notifications = await notificationRepository.createNotification(data);
         await userRepository.incrementNotifications(data.target_user_id);
         return notifications;
     },

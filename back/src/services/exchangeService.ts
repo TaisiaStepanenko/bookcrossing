@@ -173,7 +173,7 @@ export const exchangeService = {
         
         const exchange = await exchangeRepository.findById(exchange_id);
         if (exchange) {
-            await notificationRepository.createNotificstion({ 
+            await notificationRepository.createNotification({ 
                 user_id: user_id === exchange.owner_id ? exchange.initiator_id : exchange.owner_id,
                 target_user_id: user_id === exchange.owner_id ? exchange.owner_id : exchange.initiator_id,
                 transfer_id: exchange_id,

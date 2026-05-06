@@ -25,7 +25,7 @@ import type {
 export const useUserInfo = () =>
   useQuery({ queryKey: ['user'], queryFn: () => getUserInfo(), enabled: Boolean(localStorage.getItem('token')) })
 
-const getUserInfo = (): Promise<RegistrationReturn> => service.get('api/user/info')
+const getUserInfo = (): Promise<RegistrationReturn> => service.get('/api/user/info')
 
 export const useRegistration = () => {
   const navigate = useNavigate()
@@ -72,9 +72,11 @@ export const useUpdateProfile = () => {
 
 const updateProfile = (data: UpdateProfile): Promise<UpdateProfile> => service.post('/api/user/profile', data)
 
-export const useGetProfile = (id?: string) => useQuery({ queryKey: ['profile', id], queryFn: () => getProfile(id) })
+export const useGetProfile = (id?: string) =>
+  useQuery({ queryKey: ['profile', id], queryFn: () => getProfile(id), enabled: id !== undefined || id === '' })
 
-const getProfile = (id?: string): Promise<UserProfile> => service.get(`/api/user/profile/${id}`)
+const getProfile = (id?: string): Promise<UserProfile> =>
+  service.get(id ? `/api/user/profile/${id}` : '/api/user/profile')
 
 export const useGetNotification = () => useQuery({ queryKey: ['notifications'], queryFn: () => getNotification() })
 

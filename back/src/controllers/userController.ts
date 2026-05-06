@@ -41,11 +41,11 @@ export const userController = {
                 } catch {}
             }
 
-            const targerId = req.params.id ? parseInt(req.params.id) : currentUserId;
-            if (!targerId) {
+            const targetId = req.params.id ? parseInt(req.params.id) : currentUserId;
+            if (!targetId) {
                 return res.status(400).json({ message: 'User ID required when not authenticated' });
             }
-            const profile = await getUserProfile(targerId);
+            const profile = await getUserProfile(targetId);
             res.json(profile);
         } catch (error: any) {
             res.status(404).json({message: error.message});

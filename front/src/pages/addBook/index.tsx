@@ -10,6 +10,7 @@ import { AddPhotos } from '../../components/addPhotos'
 import { Container } from '../../components/common/container'
 import { TextField } from '../../components/ui/Input'
 import { CustomSelect } from '../../components/ui/Select'
+import { GENRE_OPTIONS } from './consts'
 
 import styles from './style.module.scss'
 
@@ -160,6 +161,7 @@ export const AddBookPage = () => {
       </Container>
     )
   }
+  console.log(data.genre)
 
   return (
     <Container>
@@ -200,13 +202,15 @@ export const AddBookPage = () => {
                     </Col>
 
                     <Col span={12}>
-                      <TextField
-                        onChange={onChange}
-                        name="genre"
-                        value={data.genre || ''}
+                      <CustomSelect
+                        onChange={(v) => setData({ ...data, genre: v })}
+                        mode="multiple"
+                        allowClear
+                        value={data.genre}
                         label="Жанр книги"
                         required
                         placeholder="Введите жанр книги"
+                        options={GENRE_OPTIONS}
                       />
                     </Col>
                     <Col span={12}>

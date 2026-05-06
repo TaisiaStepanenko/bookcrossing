@@ -12,7 +12,8 @@ const catalogFilterSchema = z.object({
     exchange: z.array(z.enum(['EXCHANGE', 'FREE'])).optional(),
     page: z.number().int().default(0),
     myBook: z.boolean().optional(),
-    favorite: z.boolean().optional()
+    favorite: z.boolean().optional(),
+    search: z.string().optional(),
 });
 
 export const bookEditSchema = z.object({
@@ -29,7 +30,7 @@ export const bookEditSchema = z.object({
     author: z.string().min(1, 'Автор обязателен'),
     condition: z.nativeEnum(BookCondition, { message: 'Укажите состояние книги' }),
     defects: z.string().default(''),
-    genre: z.string().min(1, 'Жанр обязателен'),
+    genre: z.array(z.string()).min(1, 'Выберите хотя бы один жанр'),
     cover: z.nativeEnum(BookCover, { message: 'Выберите тип обложки' }),
     publisherHouse: z.string().default('').optional(),
     year: z.number().int().positive().optional(),
@@ -63,7 +64,8 @@ export const bookController = {
                 page: parsed.page,
                 myBook: parsed.myBook,
                 isFavorite: parsed.favorite,
-                userId: userId
+                userId: userId,
+                search: parsed.search,
             };
 
             const result = await bookService.getCatalog(filter, userId);
@@ -86,9 +88,11 @@ export const bookController = {
 
             const authHeader = req.headers.authorization;
             const token = authHeader?.split(' ')[1];
-            const decoded: any = token&& verifyToken(token);
-
-            const userId = decoded.id;
+            let userId: number | undefined;
+            if (token) {
+                const decoded = verifyToken(token) as any;
+                userId = decoded.id;
+            }
 
             const book = await bookService.getBookInfo(bookId, userId);
             res.json(book);

@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
 
-import { BellOutlined, EnvironmentOutlined, HeartOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons'
+import { BellOutlined, HeartOutlined, SearchOutlined, UserOutlined } from '@ant-design/icons'
 
-import { Button, Col, Flex, Grid, Image, Input, Layout, Row, Space, Typography } from 'antd'
+import { Button, Col, Flex, Input, Layout, Row, Space, Typography } from 'antd'
+import { useShallow } from 'zustand/shallow'
 
 import { useGetCities } from '../../../api/hooks'
 import FooterBooks from '../../../assets/footerBooks.png'
@@ -18,22 +19,21 @@ const { Header, Content, Footer } = Layout
 export const Container = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate()
   const cities = useGetCities()
-  const user = useUserStore((store) => store.user)
-  const changeCity = useUserStore((store) => store.changeCity)
+
+  const [user, search, changeCity, changeSearch] = useUserStore(
+    useShallow(({ user, search, changeCity, changeSearch }) => [user, search, changeCity, changeSearch]),
+  )
 
   return (
     <Flex vertical>
       <div className={styles.container}>
         <Header className={styles.header}>
-          {/* Logo and location */}
-          <Flex align="flex-end" gap={'middle'}>
+          <Flex align="flex-end" gap="middle">
             <div>
               <img src={Logo} style={{ cursor: 'pointer' }} onClick={() => navigate('/catalog')} />
             </div>
             <CustomSelect
-              onChange={(v) => {
-                changeCity(v)
-              }}
+              onChange={changeCity}
               value={user?.cityId}
               required
               placeholder="Город"
@@ -43,22 +43,18 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
           </Flex>
 
           <div>
-            <Input
-              placeholder="Я ищу…"
-              prefix={<SearchOutlined />}
-              size="middle"
-              styles={{
-                input: {
-                  borderRadius: '9999px',
-                },
-                affixWrapper: {
-                  borderRadius: '9999px',
-                },
-              }}
-            />
+            <Flex gap="small">
+              <Input
+                placeholder="Я ищу…"
+                size="middle"
+                value={search}
+                onChange={(e) => changeSearch(e.target.value)}
+                styles={{ input: { borderRadius: '9999px' } }}
+              />
+              <Button shape="circle" icon={<SearchOutlined />} onClick={() => navigate('/catalog')} />
+            </Flex>
           </div>
 
-          {/* Actions */}
           <Space size="small">
             {user ? (
               <>
@@ -70,11 +66,7 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
                 <Button type="text" icon={<UserOutlined />} onClick={() => navigate('/profile')} />
               </>
             ) : (
-              <Button
-                type="text"
-                className="text-text-secondary hover:text-text-primary"
-                onClick={() => navigate('/login')}
-              >
+              <Button type="text" onClick={() => navigate('/login')}>
                 Войти
               </Button>
             )}
@@ -88,8 +80,8 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
           marginTop: 56,
           height: 586,
           background: '#F0F4FA',
-          justifyContent: 'center',
           display: 'flex',
+          justifyContent: 'center',
           paddingTop: 56,
         }}
       >
@@ -128,7 +120,7 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
               </Col>
             </Row>
           </Flex>
-          <img src={FooterBooks} />
+          <img src={FooterBooks} alt="footer" />
         </Flex>
       </Footer>
     </Flex>
