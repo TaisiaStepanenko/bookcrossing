@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { StarFilled, StarOutlined } from '@ant-design/icons'
 
-import { Avatar, Button, Card, Col, Flex, Image, Row, Typography } from 'antd'
+import { Avatar, Button, Card, Col, Flex, Image, Rate, Row, Typography } from 'antd'
 
 import { useGetCities, useGetProfile } from '../../api/hooks'
 import UserImg from '../../assets/userD.jpg'
@@ -23,6 +23,7 @@ export const UserProfile = ({ id }: { id?: string }) => {
     rating,
     registrationDate,
     reviews,
+    photo,
   } = query.data || {}
 
   return (
@@ -32,7 +33,7 @@ export const UserProfile = ({ id }: { id?: string }) => {
           <Col span={id ? 20 : 24}>
             <Flex gap={'large'} style={{ width: '100%' }}>
               <Flex vertical gap={'small'}>
-                <Image width={285} height={285} src={UserImg} />
+                <Image width={285} height={285} src={photo ? `${import.meta.env.VITE_API_URL}${photo}` : UserImg} />
                 <Button color="default" variant="solid" onClick={() => navigate('/profile/edit')}>
                   Редактировать профиль
                 </Button>
@@ -101,22 +102,27 @@ export const UserProfile = ({ id }: { id?: string }) => {
         </Flex>
       </Flex>
       <Flex vertical gap={'middle'}>
-        <Flex vertical gap={'middle'}>
-          <Flex gap={'small'} align="center">
-            <Avatar />
-            <Typography.Text>Анна</Typography.Text>
+        {reviews?.map((review: any) => (
+          <Flex vertical gap={'middle'}>
+            <Flex gap={'small'} align="center" key={review.review_id}>
+              <Avatar
+                src={
+                  review.reviewerInfo.photo ? `${import.meta.env.VITE_API_URL}${review.reviewerInfo.photo}` : undefined
+                }
+              >
+                {review.reviewerInfo.name?.[0] || '?'}
+              </Avatar>
+              <Typography.Text strong>{review.reviewerInfo.name}</Typography.Text>
+            </Flex>
+            <Flex gap={'small'}>
+              <Rate disabled defaultValue={review.rating} allowHalf style={{ fontSize: 14 }} />
+              <Typography.Text strong>({review.rating})</Typography.Text>
+            </Flex>
+            <Typography.Text>{review.comment}</Typography.Text>
+            <Typography.Text disabled> {new Date(review.review_date).toLocaleDateString()} </Typography.Text>
           </Flex>
-          <Flex gap={'small'}>
-            <StarFilled style={{ color: '#F17300' }} /> <StarFilled style={{ color: '#F17300' }} />
-            <StarFilled style={{ color: '#F17300' }} /> <StarFilled style={{ color: '#F17300' }} />
-            <Typography.Text strong>(4)</Typography.Text>
-          </Flex>
-          <Typography.Text>
-            Обмен прошёл отлично. Мария отправила всё в срок и книга действительно находится в идеальном состоянии!
-            Очень довольна!
-          </Typography.Text>
-          <Typography.Text disabled> 26 ноября 2025 </Typography.Text>
-        </Flex>
+        ))}
+        {(!reviews || reviews.length === 0) && <Typography.Text disabled>Нет отзывов</Typography.Text>}
       </Flex>
     </Flex>
   )

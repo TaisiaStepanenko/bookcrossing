@@ -168,15 +168,11 @@ export const useGetIncomingExchanges = () =>
 
 const getExchanges = (): Promise<IncomingAllExchanges[]> => service.get(`/api/exchanges/incoming`)
 
-export const useGetExchange = (
-  type: 'incoming' | 'outcoming' | 'running' | 'ended',
-  id?: string,
-  isDisabled?: boolean,
-) => {
+export const useGetExchange = (type: 'incoming' | 'outcoming' | 'running' | 'ended', id?: string, enabled = true) => {
   return useQuery({
     queryKey: ['Exchanges', type, id],
     queryFn: () => getExchange(type, id),
-    enabled: !isDisabled,
+    enabled: enabled && !!type,
   })
 }
 

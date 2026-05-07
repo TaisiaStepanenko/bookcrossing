@@ -80,7 +80,7 @@ export const BookDeliveryInfo = ({ data, setOpen }: { data: Book; setOpen: (open
                   <Typography.Text strong>({userInfo.raiting})</Typography.Text>
                 </Flex>
                 <Flex gap="small">
-                  <Typography.Text strong>{userInfo.feedbacksNumbe} отзывов</Typography.Text>
+                  <Typography.Text strong>{userInfo.reviewNumber} отзывов</Typography.Text>
                 </Flex>
               </Flex>
               <Typography.Text disabled>

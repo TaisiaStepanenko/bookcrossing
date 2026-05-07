@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import { Avatar, Button, Card, Flex, Image, Modal, Tag, Typography } from 'antd'
+import { Avatar, Button, Card, Flex, Image, message, Modal, Tag, Typography } from 'antd'
 
 import { useChangeStatus } from '../../api/hooks'
 import type { IncomingExchange, TransferStatus } from '../../api/models'
@@ -78,39 +78,48 @@ export const ExchangeCard = ({
     (type === 'incoming' && data.type === 'WAITING_CONFIRMATION') ||
     (type === 'outcoming' && data.type === 'WAITING_RESPONSE')
 
-  const showRunningButtom = () => {
+  const showRunningButton = () => {
     const { currentStatusInitiator, currentStatusOwner, userType, type } = data
 
-    if (
-      (type !== 'RECEIVED' && currentStatusInitiator === currentStatusOwner) ||
-      (currentStatusInitiator === 'WAITING_TO_BE_SENT' && currentStatusOwner === 'SENT' && userType === 'INITIATOR') ||
-      (currentStatusInitiator === 'SENT' && currentStatusOwner === 'WAITING_TO_BE_SENT' && userType === 'OWNER') ||
-      (currentStatusInitiator === 'SENT' && currentStatusOwner === 'RECEIVED' && userType === 'INITIATOR') ||
-      (currentStatusInitiator === 'RECEIVED' && currentStatusOwner === 'SENT' && userType === 'OWNER')
-    ) {
-      return true
+    if (type !== 'WAITING_TO_BE_SENT' && type !== 'SENT' && type !== 'RECEIVED') return false
+
+    if (userType === 'INITIATOR') {
+      return ['WAITING_TO_BE_SENT', 'SENT', 'RECEIVED'].includes(currentStatusInitiator)
     }
+    if (userType === 'OWNER') {
+      return ['WAITING_TO_BE_SENT', 'RECEIVED'].includes(currentStatusOwner)
+    }
+
+    return false
   }
 
-  const runningButtomText = () => {
+  const runningButtonText = () => {
     const { currentStatusInitiator, currentStatusOwner, userType } = data
 
-    if (
-      (currentStatusInitiator === 'WAITING_TO_BE_SENT' && userType === 'INITIATOR') ||
-      (currentStatusOwner === 'WAITING_TO_BE_SENT' && userType === 'OWNER')
-    ) {
-      return 'Отправть'
+    if (userType === 'INITIATOR') {
+      if (currentStatusInitiator === 'WAITING_TO_BE_SENT') return 'Отправить'
+      if (currentStatusInitiator === 'SENT') return 'Подтвердить получение'
+      if (currentStatusInitiator === 'RECEIVED') return 'Завершено'
     }
 
-    if (
-      (currentStatusInitiator === 'SENT' && userType === 'INITIATOR') ||
-      (currentStatusOwner === 'SENT' && userType === 'OWNER')
-    ) {
-      return 'Получено'
+    if (userType === 'OWNER') {
+      if (currentStatusOwner === 'WAITING_TO_BE_SENT') return 'Отправить'
+      if (currentStatusOwner === 'SENT') return 'Подтвердить получение'
+      if (currentStatusOwner === 'RECEIVED') return 'Завершено'
     }
+
+    return ''
   }
 
-  const cancel = () => mutate({ activity: 'cancel' })
+  const cancel = () =>
+    mutate(
+      { activity: 'cancel' },
+      {
+        onSuccess: () => {
+          setOpen(false)
+        },
+      },
+    )
 
   return (
     <Card style={{ width: '100%' }}>
@@ -185,7 +194,7 @@ export const ExchangeCard = ({
         )}
         {type === 'running' && (
           <Flex vertical gap="middle">
-            {showRunningButtom() && (
+            {showRunningButton() && (
               <Button
                 color="default"
                 disabled={getIsDisabledAccept()}
@@ -193,7 +202,7 @@ export const ExchangeCard = ({
                 style={{ width: 156 }}
                 onClick={() => mutate({ activity: 'accept' })}
               >
-                {runningButtomText()}
+                {runningButtonText()}
               </Button>
             )}
             <Button color="orange" variant="outlined" style={{ width: 156 }} onClick={() => setOpen(true)}>

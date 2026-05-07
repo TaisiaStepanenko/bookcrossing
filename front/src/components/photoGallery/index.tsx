@@ -21,7 +21,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
   const mainPicture = list[0]?.url
   const secondPicture = list[1]?.url
   const thirdPicture = list[2]?.url
-  const lenght = list.length - 3
+  const remainingCount = list.length - 3
 
   return (
     <Image.PreviewGroup>
@@ -29,7 +29,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
         <Image width={'100%'} height={436} alt="svg image" src={`${import.meta.env.VITE_API_URL}${mainPicture}`} />
         {secondPicture && (
           <Flex gap="small">
-            {secondPicture ? (
+            {secondPicture && (
               <Image
                 width={'calc(100% / 3)'}
                 height={88}
@@ -37,10 +37,8 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
                 src={`${import.meta.env.VITE_API_URL}${secondPicture}`}
                 style={{ objectFit: 'cover', border: undefined }}
               />
-            ) : (
-              <div className={styles['no-img']} />
             )}
-            {thirdPicture ? (
+            {thirdPicture && (
               <Image
                 width={'calc(100% / 3)'}
                 height={88}
@@ -48,15 +46,14 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
                 src={`${import.meta.env.VITE_API_URL}${thirdPicture}`}
                 style={{ objectFit: 'cover', border: undefined }}
               />
-            ) : (
-              <div className={styles['no-img']} />
             )}
-
-            <Flex className={styles['no-img']} align="center" justify="center">
-              <Typography.Title level={3} style={{ color: 'white', margin: 0 }}>
-                +{lenght}
-              </Typography.Title>
-            </Flex>
+            {remainingCount > 0 && (
+              <Flex className={styles['no-img']} align="center" justify="center">
+                <Typography.Title level={3} style={{ color: 'white', margin: 0 }}>
+                  +{remainingCount}
+                </Typography.Title>
+              </Flex>
+            )}
           </Flex>
         )}
       </Flex>

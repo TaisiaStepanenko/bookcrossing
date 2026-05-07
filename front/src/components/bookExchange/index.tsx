@@ -12,8 +12,8 @@ export const BooksExchanges = ({ type }: { type?: 'running' | 'ended' }) => {
   const [selected, setSelected] = useState('income')
   const [request, setExchange] = useState({ id: '', name: '' })
 
-  const changeSelected = (selected: string) => {
-    setSelected(selected)
+  const changeSelected = (newSelected: string) => {
+    setSelected(newSelected)
     setExchange({ id: '', name: '' })
   }
 
@@ -67,7 +67,7 @@ const Incomming = ({
   >
 }) => {
   const { data } = useGetIncomingExchanges()
-  const incomingExchange = useGetExchange('incoming', id, !id)
+  const incomingExchange = useGetExchange('incoming', id, !!id)
 
   return (
     <>

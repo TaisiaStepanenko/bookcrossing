@@ -111,7 +111,7 @@ export interface Book {
 export const BOOK_COVER = {
   HARDCOVER: { en: 'HARDCOVER', ru: 'Твердый переплет' },
   PAPERBACK: { en: 'PAPERBACK', ru: 'Мягкий переплет' },
-  SUPER_PAPERBACK: { en: 'SUPER_PAPERBACK', ru: 'Удовлетворительное' },
+  SUPER_PAPERBACK: { en: 'SUPER_PAPERBACK', ru: 'Суперобложка' },
 } as const
 type BookCover = keyof typeof BOOK_COVER
 

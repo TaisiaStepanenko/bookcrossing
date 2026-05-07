@@ -16,6 +16,7 @@ export const GENRE_OPTIONS: SelectProps['options'] = [
   { title: 'Любовный роман', value: 'Любовный роман' },
   { title: 'Медицина / Здоровье', value: 'Медицина / Здоровье' },
   { title: 'Научная литература', value: 'Научная литература' },
+  { title: 'Повесть', value: 'Повесть' },
   { title: 'Поэзия', value: 'Поэзия' },
   { title: 'Приключения', value: 'Приключения' },
   { title: 'Психология', value: 'Психология' },

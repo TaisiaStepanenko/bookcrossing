@@ -1,6 +1,16 @@
+import { useState } from 'react'
+
 import { Button, Flex, Modal, Typography } from 'antd'
 
 export const CancelModal = ({ setOpen, cancel }: { setOpen: (open: boolean) => void; cancel: () => void }) => {
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleCancel = async () => {
+    setIsLoading(true)
+    await cancel()
+    setIsLoading(false)
+  }
+
   return (
     <Modal open onCancel={() => setOpen(false)} footer={null}>
       <Flex vertical gap="middle">

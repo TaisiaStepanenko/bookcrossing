@@ -97,10 +97,10 @@ export const CatalogPage = () => {
             <Col span={24}>
               <Pagination
                 showSizeChanger={false}
-                current={data?.page}
+                current={(data?.page ?? 0) + 1}
                 total={(data?.totalPages || 1) * 12}
                 pageSize={12}
-                onChange={(page) => setFilters({ ...filters, cityId, page })}
+                onChange={(page) => setFilters({ ...filters, cityId, page: page - 1 })}
               />
             </Col>
           </Row>

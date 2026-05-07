@@ -118,6 +118,7 @@ export const AddBookPage = () => {
         {
           onSuccess: () => {
             message.success('Книга успешно обновлена')
+            navigate(`/book/${id}`)
           },
           onError: (error) => {
             message.error('Ошибка при обновлении книги')
@@ -129,6 +130,7 @@ export const AddBookPage = () => {
       addMutate(formData, {
         onSuccess: () => {
           message.success('Книга успешно добавлена')
+          navigate('/catalog')
           setData({})
           setFileList([])
           setPage(1)

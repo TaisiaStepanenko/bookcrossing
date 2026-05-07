@@ -1,6 +1,7 @@
 import { useState } from 'react'
 
 import { CloseOutlined } from '@ant-design/icons'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { Avatar, Button, Card, Col, Flex, Image, message, Modal, Pagination, Row, Typography } from 'antd'
 
@@ -43,7 +44,7 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
   const [selected, setSelected] = useState<Selected[]>([])
   const [getBookOpened, setGetBookOpened] = useState(false)
   const [error, setError] = useState('')
-
+  const queryClient = useQueryClient()
   const { mutate } = useAddExchange()
 
   const maxCount = OFFER_COUNT[offerType]
@@ -60,14 +61,24 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
     }
 
     setError('')
-    console.log('asdasdasd')
-    mutate({
-      offeredBookIds: selected.map((item) => item.id),
-      offerType: offerType,
-      targetBookId: book.id,
-    })
-    message.success('Обмен отправлен!')
-    close()
+    mutate(
+      {
+        offeredBookIds: selected.map((item) => item.id),
+        offerType: offerType,
+        targetBookId: book.id,
+      },
+      {
+        onSuccess: () => {
+          queryClient.invalidateQueries({ queryKey: ['books', { myBook: true }] })
+          queryClient.invalidateQueries({ queryKey: ['books', { favorite: true }] })
+          message.success('Обмен отправлен!')
+          close()
+        },
+        onError: (error: any) => {
+          message.error(error?.response?.data?.message || 'Ошибка при отправке обмена')
+        },
+      },
+    )
   }
 
   return (

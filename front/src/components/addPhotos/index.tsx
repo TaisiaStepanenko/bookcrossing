@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { CameraOutlined, DeleteOutlined } from '@ant-design/icons'
 
@@ -38,6 +38,16 @@ export const AddPhotos = ({
 }: AddPhotosProps) => {
   const [previewOpen, setPreviewOpen] = useState(false)
   const [previewImage, setPreviewImage] = useState('')
+
+  useEffect(() => {
+    return () => {
+      fileList.forEach((file) => {
+        if (file.url?.startsWith('blob:')) {
+          URL.revokeObjectURL(file.url)
+        }
+      })
+    }
+  }, [fileList])
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
@@ -124,7 +134,7 @@ export const AddPhotos = ({
           onRemove={handleRemove}
           multiple
         >
-          {fileList.length >= 8 ? null : uploadButton}
+          {fileList.length >= 7 ? null : uploadButton}
         </Upload>
         <div style={{ marginTop: 8, color: '#666', fontSize: 12 }}>
           Поддерживаются форматы JPG, PNG. Максимальный размер файла 5MB
