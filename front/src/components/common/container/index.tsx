@@ -5,7 +5,7 @@ import { BellOutlined, HeartOutlined, SearchOutlined, UserOutlined } from '@ant-
 import { Button, Col, Flex, Input, Layout, Row, Space, Typography } from 'antd'
 import { useShallow } from 'zustand/shallow'
 
-import { useGetCities } from '../../../api/hooks'
+import { useGetCities, useInitSearchCity } from '../../../api/hooks'
 import FooterBooks from '../../../assets/footerBooks.png'
 import Logo from '../../../assets/logo.png'
 import Quote from '../../../assets/quote.png'
@@ -17,12 +17,17 @@ import styles from './style.module.scss'
 const { Header, Content, Footer } = Layout
 
 export const Container = ({ children }: { children: React.ReactNode }) => {
+  useInitSearchCity()
+
   const navigate = useNavigate()
   const cities = useGetCities()
 
-  const [user, search, changeCity, changeSearch] = useUserStore(
-    useShallow(({ user, search, changeCity, changeSearch }) => [user, search, changeCity, changeSearch]),
+  const [user, search, changeSearch] = useUserStore(
+    useShallow(({ user, search, changeSearch }) => [user, search, changeSearch]),
   )
+
+  const searchCity = useUserStore((state) => state.searchCity)
+  const changeSearchCity = useUserStore((state) => state.changeSearchCity)
 
   return (
     <Flex vertical>
@@ -33,12 +38,13 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
               <img src={Logo} style={{ cursor: 'pointer' }} onClick={() => navigate('/catalog')} />
             </div>
             <CustomSelect
-              onChange={changeCity}
-              value={user?.cityId}
+              onChange={changeSearchCity}
+              value={searchCity}
               required
               placeholder="Город"
               style={{ width: '100%' }}
               options={(cities.data || []).map(({ cityId, name }) => ({ value: cityId, label: name }))}
+              allowClear
             />
           </Flex>
 

@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -203,4 +204,16 @@ export const useRejectAll = (id: number) => {
 
 const rejectAll = (id: number): Promise<void> => {
   return service.patch(`/api/exchanges/incoming/rejectAll/${id}`)
+}
+
+export const useInitSearchCity = () => {
+  const { data: userData, isLoading } = useUserInfo()
+  const searchCity = useUserStore((state) => state.searchCity)
+  const changeSearchCity = useUserStore((state) => state.changeSearchCity)
+
+  useEffect(() => {
+    if (!isLoading && userData && searchCity === undefined && userData.cityId) {
+      changeSearchCity(userData.cityId)
+    }
+  }, [userData, isLoading, searchCity, changeSearchCity])
 }

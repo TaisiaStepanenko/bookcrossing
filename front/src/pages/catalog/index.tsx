@@ -1,22 +1,24 @@
 import { useEffect, useState } from 'react'
 
-import { Card, Checkbox, Col, Flex, Pagination, Row, Typography } from 'antd'
+import { Card, Checkbox, Col, Flex, message, Pagination, Row, Typography } from 'antd'
 
-import { useGetBooks } from '../../api/hooks'
-import { BOOK_CONDITION, type BooksFilters, EXCHANGE_TYPE, PLACES } from '../../api/models'
+import { useGetBooks, useGetCities } from '../../api/hooks'
+import { type BooksFilters, PLACES } from '../../api/models'
 import { BookCard } from '../../components/bookCard'
 import { Container } from '../../components/common/container'
+import { CustomSelect } from '../../components/ui/Select'
 import { useUserStore } from '../../store/user'
 import { conditionOptions, exchangeTypeOptions, placeOptions } from './consts'
 
 export const CatalogPage = () => {
-  const cityId = useUserStore((state) => state.user?.cityId)
-
+  const searchCity = useUserStore((state) => state.searchCity)
   const search = useUserStore((state) => state.search)
+
   const [filters, setFilters] = useState<BooksFilters>({ page: 0, place: ['RUSSIA'] })
+
   const { data } = useGetBooks({
     ...filters,
-    cityId,
+    cityId: searchCity,
     search,
   })
 
@@ -26,6 +28,21 @@ export const CatalogPage = () => {
     }
 
     return [...(current || []), value]
+  }
+
+  const togglePlace = (value: string) => {
+    const needsPlace = value === PLACES.MY_PLACE.en || value === PLACES.NEAR.en
+
+    if (needsPlace && !searchCity) {
+      message.warning('Сначала выберите город в фильтрах')
+
+      return
+    }
+    setFilters((prev) => ({
+      ...prev,
+      page: 0,
+      place: toggleFilter(prev.place, value as any),
+    }))
   }
 
   return (
@@ -38,20 +55,21 @@ export const CatalogPage = () => {
               <Flex vertical>
                 <Flex vertical>
                   <Typography.Title level={3}>Где искать</Typography.Title>
-                  {placeOptions.map(({ value, label }) => (
-                    <Checkbox
-                      key={value}
-                      checked={filters.place?.includes(value)}
-                      onChange={() =>
-                        setFilters({
-                          ...filters,
-                          place: toggleFilter(filters.place, value),
-                        })
-                      }
-                    >
-                      {label}
-                    </Checkbox>
-                  ))}
+                  {placeOptions.map(({ value, label }) => {
+                    const needsPlace = value === PLACES.MY_PLACE.en || value === PLACES.NEAR.en
+                    const isDisabled = needsPlace && !searchCity
+
+                    return (
+                      <Checkbox
+                        key={value}
+                        checked={filters.place?.includes(value)}
+                        onChange={() => togglePlace(value)}
+                        disabled={isDisabled}
+                      >
+                        {label}
+                      </Checkbox>
+                    )
+                  })}
 
                   <Typography.Title level={3}>Способ получения</Typography.Title>
                   {exchangeTypeOptions.map(({ value, label }) => (
@@ -100,7 +118,7 @@ export const CatalogPage = () => {
                 current={(data?.page ?? 0) + 1}
                 total={(data?.totalPages || 1) * 12}
                 pageSize={12}
-                onChange={(page) => setFilters({ ...filters, cityId, page: page - 1 })}
+                onChange={(page) => setFilters({ ...filters, page: page - 1 })}
               />
             </Col>
           </Row>

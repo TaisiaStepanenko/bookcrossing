@@ -178,7 +178,7 @@ export const bookController = {
             const photos = files.map((file, index) => ({
                 isMain: index === 0,
                 url: `/uploads/${file.filename}`
-            }))
+            })) || null;
 
 
             const editBook = await bookService.updateBook(userId, bookId, {...valid, photos});
