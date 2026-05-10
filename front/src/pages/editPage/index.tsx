@@ -28,14 +28,18 @@ export const EditProfilePage = () => {
   const onChange = (name: any, value: any) => setData({ ...data, [name]: value })
 
   const onSave = () => {
-    mutateAsync({
-      birthdayDate: data.birthdayDate,
-      cityId: data.cityId,
-      name: data.name,
-      email: data.email,
-      description: data.description,
-      phone: data.phone,
-    })
+    const birthday = data.birthdayDate ? dayjs(data.birthdayDate).format('YYYY-MM-DD') : ''
+
+    const formData = new FormData()
+
+    formData.append('name', data.name || '')
+    formData.append('email', data.email || '')
+    formData.append('phone', data.phone || '')
+    formData.append('cityId', String(data.cityId ?? ''))
+    formData.append('birthdayDate', birthday)
+    formData.append('description', data.description || '')
+
+    mutateAsync(formData)
   }
 
   return (

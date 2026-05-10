@@ -9,7 +9,10 @@ const updateProfileSchema = z.object({
     name: z.string().optional(),
     email: z.string().optional(),
     phone: z.string().optional(),
-    cityId: z.number().int().positive().optional(),
+    cityId: z.preprocess((val) => {
+        if (typeof val === 'string') return parseInt(val, 10);
+        return val;
+    }, z.number().int().positive().optional()),
     birthdayDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
     photo: z.string().optional(),
     description: z.string().optional()

@@ -5,6 +5,8 @@ import { LeftOutlined, RightOutlined } from '@ant-design/icons'
 
 import { Carousel, Flex, Image, Modal, Typography } from 'antd'
 
+import BookImg from '../../assets/placeholder-book.png'
+
 import styles from './style.module.scss'
 
 interface PhotoItem {
@@ -22,6 +24,14 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
   const secondPicture = list[1]?.url
   const thirdPicture = list[2]?.url
   const remainingCount = list.length - 3
+
+  if (!mainPicture) {
+    return (
+      <Flex vertical gap="small" className={styles['img-box']}>
+        <Image width="100%" height={436} src={BookImg} alt="Нет фото" fallback={BookImg} />
+      </Flex>
+    )
+  }
 
   return (
     <Image.PreviewGroup>

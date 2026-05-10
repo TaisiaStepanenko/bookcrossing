@@ -16,7 +16,8 @@ export const BookPage = () => {
   const [open, setOpen] = useState(false)
   const params = useParams()
 
-  const { data, isLoading } = useGetBook(params?.id || 0)
+  const bookId = Number(params?.id)
+  const { data, isLoading } = useGetBook(isNaN(bookId) ? 0 : bookId)
 
   if (isLoading || !data)
     return (
@@ -24,6 +25,8 @@ export const BookPage = () => {
         <Spin />
       </Flex>
     )
+
+  const firstPhotoUrl = data.photos?.[0]?.url || ''
 
   return (
     <Container>
@@ -56,7 +59,7 @@ export const BookPage = () => {
       <ExchangeWithModal
         open={open}
         setOpen={setOpen}
-        book={{ id: data.bookId, name: data.name, url: data.photos[0].url }}
+        book={{ id: data.bookId, name: data.name, url: firstPhotoUrl }}
       />
     </Container>
   )

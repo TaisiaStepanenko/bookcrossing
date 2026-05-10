@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
+import { message } from 'antd'
+
 import service from '../axios'
 import { useUserStore } from '../store/user'
 import type {
@@ -63,15 +65,22 @@ export const useUpdateProfile = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (data: UpdateProfile) => updateProfile(data),
+    mutationFn: (formData: FormData) => updateProfile(formData),
     onSuccess: (data: any) => {
       queryClient.invalidateQueries({ queryKey: ['profile'], refetchType: 'active' })
+      queryClient.invalidateQueries({ queryKey: ['user'] })
       navigate('/profile')
+    },
+    onError: (error: any) => {
+      message.error(error?.response?.data.message || 'Ошибка обновления профиля')
     },
   })
 }
 
-const updateProfile = (data: UpdateProfile): Promise<UpdateProfile> => service.post('/api/user/profile', data)
+const updateProfile = (formData: FormData): Promise<UpdateProfile> =>
+  service.post('/api/user/profile', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
 
 export const useGetProfile = (id?: string) =>
   useQuery({ queryKey: ['profile', id], queryFn: () => getProfile(id), enabled: id !== undefined || id === '' })

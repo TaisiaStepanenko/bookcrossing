@@ -2,11 +2,11 @@ import { useNavigate } from 'react-router-dom'
 
 import { EnvironmentOutlined, HeartOutlined } from '@ant-design/icons'
 
-import { Badge, Button, Flex, Image, Tag, Typography } from 'antd'
+import { Button, Flex, Typography } from 'antd'
 
 import { useAddFavorite, useRemoveFavorite } from '../../api/hooks'
-import { type BookCatalogItem, PLACES } from '../../api/models'
-import testImg from '../../assets/testImg.png'
+import { type BookCatalogItem } from '../../api/models'
+import BookImg from '../../assets/placeholder-book.png'
 import { BookStatus } from '../bookStatus'
 
 export const BookCard = ({ item }: { item: BookCatalogItem }) => {
@@ -24,6 +24,8 @@ export const BookCard = ({ item }: { item: BookCatalogItem }) => {
       addFavorite.mutateAsync(item.id)
     }
   }
+
+  const imageUrl = item.src ? `${import.meta.env.VITE_API_URL}${item.src}` : BookImg
 
   return (
     <Flex vertical style={{ position: 'relative' }} onClick={() => navigate(`/book/${item.id}`)}>
@@ -46,13 +48,16 @@ export const BookCard = ({ item }: { item: BookCatalogItem }) => {
         width={285}
         height={359}
         alt="basic"
-        src={`${import.meta.env.VITE_API_URL}${item.src}`}
+        src={imageUrl}
         style={{ borderRadius: 16 }}
+        onError={(e) => {
+          e.currentTarget.src = BookImg
+        }}
       />
       <BookStatus style={{ position: 'absolute', top: 12, left: 12 }} status={item.exchangeMethod} />
       <Typography.Title level={5}>{item.name}</Typography.Title>
-      <Typography.Text color="secondary">{item.author}</Typography.Text>
-      <Typography.Text color="secondary">
+      <Typography.Text type="secondary">{item.author}</Typography.Text>
+      <Typography.Text type="secondary">
         <EnvironmentOutlined /> {item.place}
       </Typography.Text>
     </Flex>

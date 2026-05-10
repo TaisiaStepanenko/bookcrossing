@@ -19,10 +19,10 @@ export const MyBooks = ({ isFavorite }: { isFavorite: boolean }) => {
       <Col span={24}>
         <Pagination
           showSizeChanger={false}
-          current={data?.page}
+          current={(data?.page ?? 0) + 1}
           total={(data?.totalPages || 1) * 12}
           pageSize={12}
-          onChange={(page) => setPage(page)}
+          onChange={(page) => setPage(page - 1)}
         />
       </Col>
     </Row>

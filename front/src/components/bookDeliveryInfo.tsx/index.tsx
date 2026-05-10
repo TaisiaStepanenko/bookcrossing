@@ -70,7 +70,7 @@ export const BookDeliveryInfo = ({ data, setOpen }: { data: Book; setOpen: (open
             </Flex>
           ) : (
             <Flex gap="small" vertical>
-              <Flex gap="small" align="center">
+              <Flex gap="small" align="center" onClick={() => navigate(`/profile/user/${userInfo.userId}`)}>
                 <Avatar size={48} icon={<UserOutlined />} src={userInfo.avatar} />
                 <Typography.Text strong>{userInfo.name}</Typography.Text>
               </Flex>

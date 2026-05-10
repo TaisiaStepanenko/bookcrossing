@@ -57,6 +57,17 @@ export const RegistrationPage = () => {
     }
   }
 
+  const translateErrorMessage = (error: any): string => {
+    const message = error?.response?.data?.message
+
+    if (message === 'User already exists') return 'Пользователь с таким email уже существует'
+    if (message === 'Invalid password') return 'Неверный пароль'
+    if (message === 'Password must be at least 6 characters') return 'Пароль должен содержать не менее 6 символов'
+    if (message === 'Email is invalid') return 'Некорректный email'
+
+    return message || 'Произошла ошибка, попробуйте позже'
+  }
+
   return (
     <AuthContainer>
       <div style={{ width: '100%' }}>
@@ -129,7 +140,21 @@ export const RegistrationPage = () => {
           {((isShowError && isError) || registration.error) && (
             <Col span={24}>
               <Typography.Text color="var(--ant-red)" style={{ color: 'var(--ant-red)' }}>
-                {registration.error?.response?.data?.errors.map(({ message }) => `${message}, `) || isError}
+                {((isShowError && isError) || registration.error) && (
+                  <Col span={24}>
+                    <Typography.Text type="danger">
+                      {(() => {
+                        const err = registration.error as any
+
+                        if (err?.response?.data?.errors) {
+                          return err.response.data.errors.map((e: { message: string }) => e.message).join(', ')
+                        }
+
+                        return translateErrorMessage(err) || isError
+                      })()}
+                    </Typography.Text>
+                  </Col>
+                )}
               </Typography.Text>
             </Col>
           )}

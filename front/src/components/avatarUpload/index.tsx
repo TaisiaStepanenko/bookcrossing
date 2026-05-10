@@ -4,13 +4,6 @@ import { CameraOutlined, DeleteOutlined } from '@ant-design/icons'
 
 import { type GetProp, Image, message, Upload, type UploadFile, type UploadProps } from 'antd'
 
-declare module 'antd' {
-  interface UploadFile {
-    existingUrl?: string
-    isMain?: boolean
-  }
-}
-
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0]
 
 const getBase64 = (file: FileType): Promise<string> =>

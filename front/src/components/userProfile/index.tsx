@@ -34,9 +34,11 @@ export const UserProfile = ({ id }: { id?: string }) => {
             <Flex gap={'large'} style={{ width: '100%' }}>
               <Flex vertical gap={'small'}>
                 <Image width={285} height={285} src={photo ? `${import.meta.env.VITE_API_URL}${photo}` : UserImg} />
-                <Button color="default" variant="solid" onClick={() => navigate('/profile/edit')}>
-                  Редактировать профиль
-                </Button>
+                {!id && (
+                  <Button color="default" variant="solid" onClick={() => navigate('/profile/edit')}>
+                    Редактировать профиль
+                  </Button>
+                )}
               </Flex>
 
               <Flex vertical gap={'large'} style={{ width: '100%' }}>
