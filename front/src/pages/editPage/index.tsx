@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 
-import { Button, Col, Flex, Row, Typography } from 'antd'
+import { Button, Col, Flex, Row, Typography, type UploadFile } from 'antd'
 import dayjs from 'dayjs'
 
 import { useGetCities, useGetProfile, useUpdateProfile } from '../../api/hooks'
 import type { UserProfile } from '../../api/models'
 import changeProfile from '../../assets/changeProfile.png'
+import { AddPhotos } from '../../components/avatarUpload'
 import { Container } from '../../components/common/container'
 import { CustomDatePicker } from '../../components/DatePicker'
 import { TextField } from '../../components/ui/Input'
@@ -16,12 +17,29 @@ import styles from './styles.module.scss'
 export const EditProfilePage = () => {
   const [data, setData] = useState<UserProfile>({} as any)
   const query = useGetProfile('')
+  const [fileList, setFileList] = useState<UploadFile[]>([])
   const { mutateAsync } = useUpdateProfile()
   const cities = useGetCities()
 
   useEffect(() => {
     if (query.data) {
       setData(query.data)
+    }
+
+    const avatar = query.data?.photo
+
+    if (avatar) {
+      const existingFiles: UploadFile[] = [
+        {
+          uid: `existing-avatar`,
+          name: avatar.split('/').pop() || `avatar`,
+          status: 'done',
+          url: `${import.meta.env.VITE_API_URL}${avatar}`, // Полный URL для отображения
+          existingUrl: avatar, // Сохраняем относительный URL для отправки на сервер
+        },
+      ]
+
+      setFileList(existingFiles)
     }
   }, [query.data])
 
@@ -39,6 +57,10 @@ export const EditProfilePage = () => {
     formData.append('birthdayDate', birthday)
     formData.append('description', data.description || '')
 
+    if (fileList[0].originFileObj) {
+      formData.append('avatar', fileList[0].originFileObj)
+    }
+
     mutateAsync(formData)
   }
 
@@ -54,6 +76,9 @@ export const EditProfilePage = () => {
               <Row gutter={[20, 20]}>
                 <Col span={24}>
                   <Typography.Title>Профиль пользователя</Typography.Title>
+                </Col>
+                <Col span={24}>
+                  <AddPhotos fileList={fileList} setFileList={setFileList} />
                 </Col>
                 <Col span={12}>
                   <TextField

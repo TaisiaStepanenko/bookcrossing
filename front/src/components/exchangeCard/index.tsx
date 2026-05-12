@@ -121,11 +121,13 @@ export const ExchangeCard = ({
       },
     )
 
+  console.log(data)
+
   return (
     <Card style={{ width: '100%' }}>
       <Flex vertical gap="middle">
         <Flex gap="small">
-          <Avatar />
+          <Avatar src={`${import.meta.env.VITE_API_URL}${data.avatar}`} />
           <Flex vertical>
             <Typography.Title style={{ margin: 0 }} level={4}>
               {getTitle()}

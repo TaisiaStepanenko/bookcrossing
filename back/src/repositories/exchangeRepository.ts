@@ -1,6 +1,7 @@
-import { OfferType, TransferStatus, BookStatus } from "../constants/enums";
+import { OfferType, TransferStatus, BookStatus, MessageType } from "../constants/enums";
 import { Book, BookPhoto, OfferingBook, Transfer, User } from "../models";
 import { Op } from "sequelize";
+import { notificationService } from "../services/notificationService";
 
 
 export const exchangeRepository = {
@@ -15,6 +16,7 @@ export const exchangeRepository = {
         })
     },
 
+
     async addOfferingBooks(transfer_id: number, book_ids: number[]) {
         const books = book_ids.map((book_id, index) => ({
             transfer_id: transfer_id,
@@ -22,6 +24,23 @@ export const exchangeRepository = {
             sort_order: index,
         }))
         return OfferingBook.bulkCreate(books);
+    },
+
+    async addFreeExchange(book_id: number, init_user_id: number) {
+        const target_book = await Book.findByPk(book_id);
+
+        if (!target_book) throw new Error('Book not found');
+        if (target_book.owner_id === init_user_id) throw new Error('Cannot request your own book');
+        if (target_book.status !== BookStatus.AVAILABLE) throw new Error('Target book is not available');
+
+        const exchange = await exchangeRepository.addBookExchange(
+            book_id,
+            init_user_id,
+            target_book.owner_id,
+            OfferType.ONE
+        )
+
+        return exchangeRepository.findById(exchange.transfer_id);
     },
 
     
@@ -34,7 +53,7 @@ export const exchangeRepository = {
 
     async getAllIncomingExchanges(user_id: number): Promise<any> {
         return Transfer.findAll({
-            where: {owner_id: user_id},
+            where: {owner_id: user_id, current_status_owner: TransferStatus.WAITING_CONFIRMATION ||TransferStatus.WAITING_RESPONSE },
             include: [
                 {model: User, as: 'initiator', attributes: ['user_id', 'name', 'photo']},
                 {model: Book, as: 'book', attributes: ['book_id', 'name'], include: [

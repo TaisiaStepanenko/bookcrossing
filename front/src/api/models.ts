@@ -137,7 +137,7 @@ export const EXCHANGE_TYPE = {
   FREE: { en: 'FREE', ru: 'Отдам даром' },
 } as const
 
-type ExchangeType = keyof typeof EXCHANGE_TYPE
+export type ExchangeType = keyof typeof EXCHANGE_TYPE
 
 export const PLACES = {
   MY_PLACE: { en: 'MY_PLACE', ru: 'Только в моём городе' },
@@ -174,7 +174,7 @@ export type OfferType = keyof typeof OFFER_TYPE
 export interface BookExchange {
   targetBookId: number
   offeredBookIds: number[]
-  offerType: OfferType
+  offerType?: OfferType
 }
 
 export interface IncomingAllExchanges {
@@ -233,6 +233,7 @@ export interface Notification {
   messageType: 'EXCHANGE' | 'REVIEW'
   isRead: boolean
   createdAt: string
+  curStutus: 'NEW' | 'RUNNING' | 'ENDED'
 }
 
 export interface ChangeStatus {

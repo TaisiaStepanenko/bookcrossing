@@ -163,7 +163,6 @@ export const AddBookPage = () => {
       </Container>
     )
   }
-  console.log(data.genre)
 
   return (
     <Container>

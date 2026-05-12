@@ -126,7 +126,7 @@ export const AddPhotos = ({
           onRemove={handleRemove}
           multiple
         >
-          {fileList.length >= 7 ? null : uploadButton}
+          {fileList.length >= 1 ? null : uploadButton}
         </Upload>
         <div style={{ marginTop: 8, color: '#666', fontSize: 12 }}>
           Поддерживаются форматы JPG, PNG. Максимальный размер файла 5MB

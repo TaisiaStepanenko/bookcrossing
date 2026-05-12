@@ -59,7 +59,7 @@ export const BookPage = () => {
       <ExchangeWithModal
         open={open}
         setOpen={setOpen}
-        book={{ id: data.bookId, name: data.name, url: firstPhotoUrl }}
+        book={{ id: data.bookId, name: data.name, url: firstPhotoUrl, exchangeType: data.exchangeType }}
       />
     </Container>
   )

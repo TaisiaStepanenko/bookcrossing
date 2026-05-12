@@ -70,6 +70,37 @@ export const exchangeService = {
         return exchangeRepository.findById(exchange.transfer_id);
     },
 
+    async addFreeExchange(book_id: number, init_user_id: number) {
+        const book = await Book.findByPk(book_id);
+        if (!book) {
+            throw new Error ('Book not found');
+        }
+
+        if (book.owner_id === init_user_id) {
+            throw new Error ('Cannot exchange your own book');
+        }
+
+        if (book.status != BookStatus.AVAILABLE) {
+            throw new Error('Target book is not available');
+        }
+
+        const exchange = await exchangeRepository.addBookExchange(
+            book_id,
+            init_user_id,
+            book.owner_id,
+            OfferType.ONE
+        );
+
+        await notificationService.createNotification({
+            user_id: init_user_id,
+            target_user_id: book.owner_id,
+            transfer_id: exchange.transfer_id,
+            message_type: MessageType.EXCHANGE,
+        });
+
+        return exchangeRepository.findById(exchange.transfer_id);
+    },
+
     async getIncomingExchanges(user_id: number) {
         const exchanges = await exchangeRepository.getAllIncomingExchanges(user_id);
 

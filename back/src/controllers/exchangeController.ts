@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import {z} from 'zod';
-import { OfferType } from "../constants/enums";
+import { ExchangeType, OfferType } from "../constants/enums";
 import { exchangeService } from "../services/exchangeService";
+import { Book } from "../models";
 
 const createExchangeSchema = z.object({
     targetBookId: z.number().int().positive(),
@@ -17,6 +18,18 @@ export const exchangeController = {
             const initiatorId = (req as any).user?.id;
             if (!initiatorId) {
                 return res.status(401).json({ message: 'Unauthorized' });
+            }
+
+            const { targetBookId, offeredBookIds, offerType } = req.body;
+
+            const targetBook = await Book.findByPk(targetBookId);
+            if (!targetBook) {
+                return res.status(404).json({ message: 'Book not found' });
+            }
+
+            if (targetBook.exchangeType === ExchangeType.FREE) {
+                const exchange = await exchangeService.addFreeExchange(targetBookId, initiatorId);
+                return res.status(200).json(exchange);
             }
 
             const parsedInfo = createExchangeSchema.parse(req.body);

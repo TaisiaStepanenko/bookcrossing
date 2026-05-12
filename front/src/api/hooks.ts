@@ -186,8 +186,8 @@ export const useGetExchange = (type: 'incoming' | 'outcoming' | 'running' | 'end
   })
 }
 
-const getExchange = (type: 'incoming' | 'outcoming' | 'running' | 'ended', id?: string): Promise<IncomingExchange[]> =>
-  service.get(`/api/exchanges/${type}/${id}`)
+const getExchange = (type: string, id?: string): Promise<IncomingExchange[]> =>
+  service.get(`/api/exchanges/${type}${id ? `/${id}` : ''}`)
 
 export const useChangeStatus = (id: number) => {
   const queryClient = useQueryClient()

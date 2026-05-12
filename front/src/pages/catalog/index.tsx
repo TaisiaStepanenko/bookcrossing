@@ -14,7 +14,7 @@ export const CatalogPage = () => {
   const searchCity = useUserStore((state) => state.searchCity)
   const search = useUserStore((state) => state.search)
 
-  const [filters, setFilters] = useState<BooksFilters>({ page: 0, place: ['RUSSIA'] })
+  const [filters, setFilters] = useState<BooksFilters>({ page: 1, place: ['RUSSIA'] })
 
   const { data } = useGetBooks({
     ...filters,
@@ -44,6 +44,10 @@ export const CatalogPage = () => {
       place: toggleFilter(prev.place, value as any),
     }))
   }
+
+  useEffect(() => {
+    setFilters({ ...filters, page: 0 })
+  }, [search])
 
   return (
     <Container>

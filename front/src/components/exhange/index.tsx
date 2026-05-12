@@ -6,9 +6,10 @@ import { useQueryClient } from '@tanstack/react-query'
 import { Avatar, Button, Card, Col, Flex, Image, message, Modal, Pagination, Row, Typography } from 'antd'
 
 import { useAddExchange, useGetBooks } from '../../api/hooks'
-import { OFFER_TYPE, type OfferType } from '../../api/models'
+import { type ExchangeType, OFFER_TYPE, type OfferType } from '../../api/models'
 import AddBookExchange from '../../assets/addBookExchange.png'
 import Arrows from '../../assets/arrows.png'
+import BookImg from '../../assets/placeholder-book.png'
 import { CustomSelect } from '../ui/Select'
 
 export const ExchangeWithModal = ({
@@ -31,6 +32,7 @@ interface Selected {
   url: string
   name: string
   id: number
+  exchangeType?: ExchangeType
 }
 
 export const OFFER_COUNT: Record<OfferType, number> = {
@@ -47,14 +49,14 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
   const queryClient = useQueryClient()
   const { mutate } = useAddExchange()
 
-  const maxCount = OFFER_COUNT[offerType]
+  const isFree = book.exchangeType === 'FREE'
 
   const removeBook = (id: number) => {
     setSelected((prev) => prev.filter((b) => b.id !== id))
   }
-
+  const imageUrl = book.url ? `${import.meta.env.VITE_API_URL}${book.url}` : BookImg
   const handleExchange = () => {
-    if (!offerType || selected.length !== maxCount) {
+    if (!offerType) {
       setError('Сначала выберите книги для обмена и тип обмена')
 
       return
@@ -64,7 +66,7 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
     mutate(
       {
         offeredBookIds: selected.map((item) => item.id),
-        offerType: offerType,
+        offerType: isFree ? undefined : offerType,
         targetBookId: book.id,
       },
       {
@@ -85,45 +87,50 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
     <Card style={{ width: '100%', maxWidth: 863 }}>
       <Flex vertical gap="middle">
         <Typography.Title style={{ margin: 0, textAlign: 'center' }} level={3}>
-          Заявка на обмен
+          Заявка на{isFree ? 'получение книги' : 'обмен'}
         </Typography.Title>
 
-        <Typography.Title style={{ margin: 0 }} level={4}>
-          Ваберете книги для обмена
-        </Typography.Title>
+        {!isFree && (
+          <Typography.Title style={{ margin: 0 }} level={4}>
+            Ваберете книги для обмена
+          </Typography.Title>
+        )}
 
         {/* КНИГИ */}
         <Flex gap="small" align="center">
-          <Image src={`${import.meta.env.VITE_API_URL}${book.url}`} height={240} width={178} />
+          <Image src={imageUrl} height={240} width={178} />
+          {!isFree && (
+            <>
+              <Image src={Arrows} height={80} width={69} />
 
-          <Image src={Arrows} height={80} width={69} />
+              {[0, 1, 2].map((i) => {
+                const item = selected[i]
 
-          {[0, 1, 2].map((i) => {
-            const item = selected[i]
+                return (
+                  <div key={i} style={{ position: 'relative' }}>
+                    <Image
+                      onClick={() => setGetBookOpened(true)}
+                      src={item ? item.url : AddBookExchange}
+                      preview={false}
+                      height={240}
+                      width={178}
+                    />
 
-            return (
-              <div key={i} style={{ position: 'relative' }}>
-                <Image
-                  onClick={() => setGetBookOpened(true)}
-                  src={item ? item.url : AddBookExchange}
-                  preview={false}
-                  height={240}
-                  width={178}
-                />
-
-                {/* КНОПКА УДАЛЕНИЯ */}
-                {item && (
-                  <Button
-                    shape="circle"
-                    icon={<CloseOutlined />}
-                    size="small"
-                    style={{ position: 'absolute', top: 8, right: 8 }}
-                    onClick={() => removeBook(item.id)}
-                  />
-                )}
-              </div>
-            )
-          })}
+                    {/* КНОПКА УДАЛЕНИЯ */}
+                    {item && (
+                      <Button
+                        shape="circle"
+                        icon={<CloseOutlined />}
+                        size="small"
+                        style={{ position: 'absolute', top: 8, right: 8 }}
+                        onClick={() => removeBook(item.id)}
+                      />
+                    )}
+                  </div>
+                )
+              })}
+            </>
+          )}
         </Flex>
 
         {/* ОПИСАНИЕ */}
@@ -135,40 +142,42 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
             <Typography.Text>{book.name}</Typography.Text>
           </Flex>
 
-          <Flex vertical>
-            <Typography.Title level={4} style={{ margin: 0 }}>
-              Вы предлагаете к обмену
-            </Typography.Title>
+          {!isFree && (
+            <Flex vertical>
+              <Typography.Title level={4} style={{ margin: 0 }}>
+                Вы предлагаете к обмену
+              </Typography.Title>
 
-            {selected.length ? (
-              selected.map(({ name }, index) => (
-                <Typography.Text key={index}>
-                  {index + 1}. {name}
-                </Typography.Text>
-              ))
-            ) : (
-              <Typography.Text>-</Typography.Text>
-            )}
-          </Flex>
+              {selected.length ? (
+                selected.map(({ name }, index) => (
+                  <Typography.Text key={index}>
+                    {index + 1}. {name}
+                  </Typography.Text>
+                ))
+              ) : (
+                <Typography.Text>-</Typography.Text>
+              )}
+            </Flex>
+          )}
         </Flex>
 
         {/* SELECT */}
-        <CustomSelect
-          onChange={(v) => {
-            setOfferType(v)
-
-            if (OFFER_COUNT[v] < selected.length) setSelected([]) // сбрасываем выбор при смене типа
-          }}
-          value={offerType}
-          label="Способы обмена"
-          required
-          placeholder="Выберете способ обмена"
-          style={{ width: '100%' }}
-          options={Object.keys(OFFER_TYPE).map((val: any) => ({
-            value: val,
-            label: OFFER_TYPE[val],
-          }))}
-        />
+        {!isFree && (
+          <CustomSelect
+            onChange={(v) => {
+              setOfferType(v)
+            }}
+            value={offerType}
+            label="Способы обмена"
+            required
+            placeholder="Выберете способ обмена"
+            style={{ width: '100%' }}
+            options={Object.keys(OFFER_TYPE).map((val: any) => ({
+              value: val,
+              label: OFFER_TYPE[val],
+            }))}
+          />
+        )}
 
         {/* КНОПКИ */}
         <Flex gap="small">
@@ -184,12 +193,7 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
       </Flex>
 
       {getBookOpened && (
-        <GetBook
-          setGetBookOpened={setGetBookOpened}
-          setSelected={setSelected}
-          selected={selected}
-          maxCount={maxCount}
-        />
+        <GetBook setGetBookOpened={setGetBookOpened} setSelected={setSelected} selected={selected} maxCount={3} />
       )}
     </Card>
   )

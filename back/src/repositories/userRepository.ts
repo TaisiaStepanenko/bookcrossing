@@ -128,21 +128,16 @@ export const userRepository = {
         const {notifications, total} = await notificationRepository.findByTargetUser(user_id, limit, offset);
         
 
-        return {
-            items: notifications.map((n: any) => ({
-                notification_id: n.notification_id,
-                user_id: n.user_id,                  
-                user_name: n.initiator?.name || '',
-                transfer_id: n.transfer_id,
-                message_type: n.message_type,
-                is_read: n.is_read,
-                created_at: n.created_at,
-                cur_stutus: STATUS_TABS[n.transfer.cur_status as TransferStatus]
-            })),
-            totaltem: total,
-            totalPages: Math.ceil(total/limit),
-            currentPage: page
-        }
+        return notifications.map((n: any) => ({
+            notificationId: n.notification_id,
+            userId: n.user_id,                  
+            userName: n.initiator?.name || '',
+            transferId: n.transfer_id,
+            messageType: n.message_type,
+            isRead: n.is_read,
+            createdAt: n.created_at,
+            curStutus: STATUS_TABS[n.transfer.cur_status as TransferStatus]
+        }))
     },
 
     async incrementNotifications(user_id: number): Promise<void> {

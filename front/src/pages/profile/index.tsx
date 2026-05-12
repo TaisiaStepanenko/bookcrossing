@@ -36,6 +36,7 @@ export const ProfilePage = () => {
                 <Typography.Text strong>Личный кабинет</Typography.Text>
                 {BUTTONS.map(({ icon, name, title }) => (
                   <Typography.Text
+                    key={name}
                     className={profilePage === name ? styles['profile-filter-selected'] : undefined}
                     style={{ cursor: 'pointer' }}
                     onClick={() => changeProfilePage(name)}
