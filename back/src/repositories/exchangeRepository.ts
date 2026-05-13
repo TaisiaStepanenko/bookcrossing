@@ -53,7 +53,12 @@ export const exchangeRepository = {
 
     async getAllIncomingExchanges(user_id: number): Promise<any> {
         return Transfer.findAll({
-            where: {owner_id: user_id, current_status_owner: TransferStatus.WAITING_CONFIRMATION ||TransferStatus.WAITING_RESPONSE },
+            where: {
+                owner_id: user_id,
+                current_status_owner: {
+                    [Op.in]: [TransferStatus.WAITING_RESPONSE, TransferStatus.WAITING_CONFIRMATION]
+                }
+            },
             include: [
                 {model: User, as: 'initiator', attributes: ['user_id', 'name', 'photo']},
                 {model: Book, as: 'book', attributes: ['book_id', 'name'], include: [

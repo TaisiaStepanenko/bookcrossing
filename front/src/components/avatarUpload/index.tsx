@@ -106,7 +106,6 @@ export const AddPhotos = ({
   return (
     <>
       <div>
-        <div style={{ marginBottom: 8 }}>Фотографии книги (максимальное количество фотографий 7)</div>
         <Upload
           listType="picture-card"
           fileList={fileList.map((file) => {

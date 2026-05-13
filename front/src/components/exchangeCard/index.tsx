@@ -22,6 +22,8 @@ export const ExchangeCard = ({
   const [selected, setSelected] = useState<number[]>([])
   const [open, setOpen] = useState(false)
 
+  const isFree = data.initiatorBooks.length === 0
+
   const onChangeSelected = (id: number) => {
     if (OFFER_COUNT[data.bookCount] < selected.length) {
       return null
@@ -36,9 +38,10 @@ export const ExchangeCard = ({
 
   const getTitle = () => {
     if (type === 'incoming') {
-      return `${data.name} предлагает обмен!`
-    } else {
-      return `Обмен с пользователем ${data.name}`
+      return isFree ? `${data.name} хочет получить вашу книгу` : `${data.name} предлагает обмен`
+    }
+    if (type === 'outcoming') {
+      return isFree ? `Вы запросили книгу у ${data.name}` : `Ваше предложение обмена для ${data.name}`
     }
   }
 
@@ -135,30 +138,33 @@ export const ExchangeCard = ({
             {getEndedText() ? (
               <Typography.Text disabled>{getEndedText()}</Typography.Text>
             ) : (
-              <Typography.Text>
-                {data.bookCount === 'THREE'
-                  ? 'Все 3 книги на 1 вашу'
-                  : data.bookCount === 'TWO'
-                    ? '2 из 3 книг на выбор'
-                    : '1 из 3 книг на выбор'}
-              </Typography.Text>
+              isFree && (
+                <Typography.Text>
+                  {data.bookCount === 'THREE'
+                    ? 'Все 3 книги на 1 вашу'
+                    : data.bookCount === 'TWO'
+                      ? '2 из 3 книг на выбор'
+                      : '1 из 3 книг на выбор'}
+                </Typography.Text>
+              )
             )}
           </Flex>
         </Flex>
         <Flex gap="small" align="center">
           <Image src={`${import.meta.env.VITE_API_URL}${data.ownerBook.src}`} height={240} width={178} />
-          <Image src={Arrows} height={80} width={69} />
-          {data.initiatorBooks.map((book) => (
-            <Image
-              onClick={() => type === 'incoming' && data.type === 'WAITING_RESPONSE' && onChangeSelected(book.id)}
-              src={`${import.meta.env.VITE_API_URL}${book.src}`}
-              className={selected.includes(book.id) ? styles.selected : undefined}
-              preview={false}
-              key={book.id}
-              height={240}
-              width={178}
-            />
-          ))}
+          {!isFree && <Image src={Arrows} height={80} width={69} />}
+          {!isFree &&
+            data.initiatorBooks.map((book) => (
+              <Image
+                onClick={() => type === 'incoming' && data.type === 'WAITING_RESPONSE' && onChangeSelected(book.id)}
+                src={`${import.meta.env.VITE_API_URL}${book.src}`}
+                className={selected.includes(book.id) ? styles.selected : undefined}
+                preview={false}
+                key={book.id}
+                height={240}
+                width={178}
+              />
+            ))}
         </Flex>
         <Flex gap="middle">
           <Flex vertical>
@@ -167,16 +173,18 @@ export const ExchangeCard = ({
             </Typography.Title>
             <Typography.Text>{data.ownerBook.name}</Typography.Text>
           </Flex>
-          <Flex vertical>
-            <Typography.Title style={{ margin: 0 }} level={4}>
-              {data.userType === 'INITIATOR' ? 'Вы отдаете' : 'Вы получаете'}
-            </Typography.Title>
-            {data.initiatorBooks.map((book, index) => (
-              <Typography.Text key={book.id}>
-                {index + 1}. {book.name}
-              </Typography.Text>
-            ))}
-          </Flex>
+          {!isFree && (
+            <Flex vertical>
+              <Typography.Title style={{ margin: 0 }} level={4}>
+                {data.userType === 'INITIATOR' ? 'Вы отдаете' : 'Вы получаете'}
+              </Typography.Title>
+              {data.initiatorBooks.map((book, index) => (
+                <Typography.Text key={book.id}>
+                  {index + 1}. {book.name}
+                </Typography.Text>
+              ))}
+            </Flex>
+          )}
         </Flex>
         {type === 'running' && (
           <Flex gap="middle">
@@ -217,18 +225,35 @@ export const ExchangeCard = ({
         )}
 
         <Typography.Text strong>{getHelperText()}</Typography.Text>
-        {(type === 'outcoming' || type === 'incoming') && (
+        {/* Входящие заявки – владелец книги */}
+        {type === 'incoming' && (
           <Flex gap="small">
-            <Button
-              color="default"
-              disabled={getIsDisabledAccept()}
-              variant="solid"
-              onClick={() => mutate({ activity: 'accept', keptBookIds: selected })}
-            >
-              Обменяться
-            </Button>
+            {!isFree && (
+              <Button
+                color="default"
+                disabled={getIsDisabledAccept()}
+                variant="solid"
+                onClick={() => mutate({ activity: 'accept', keptBookIds: selected })}
+              >
+                Обменяться
+              </Button>
+            )}
+            {isFree && (
+              <Button color="default" variant="solid" onClick={() => mutate({ activity: 'accept' })}>
+                Принять заявку
+              </Button>
+            )}
             <Button color="orange" variant="outlined" onClick={() => cancel()}>
               Отклонить
+            </Button>
+          </Flex>
+        )}
+
+        {/* Исходящие заявки – инициатор (только отмена) */}
+        {type === 'outcoming' && (
+          <Flex gap="small">
+            <Button color="orange" variant="outlined" onClick={() => cancel()}>
+              Отменить заявку
             </Button>
           </Flex>
         )}
