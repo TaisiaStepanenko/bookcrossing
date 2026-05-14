@@ -181,6 +181,7 @@ export interface IncomingAllExchanges {
   id: number
   name: string
   src: string
+  exchangeType: 'EXCHANGE' | 'FREE'
   people: {
     id: number
     name: string
@@ -233,7 +234,10 @@ export interface Notification {
   messageType: 'EXCHANGE' | 'REVIEW'
   isRead: boolean
   createdAt: string
+  transferStatus?: string
   curStutus: 'NEW' | 'RUNNING' | 'ENDED'
+  bookTitle?: string
+  exchangeType?: 'EXCHANGE' | 'FREE'
 }
 
 export interface ChangeStatus {

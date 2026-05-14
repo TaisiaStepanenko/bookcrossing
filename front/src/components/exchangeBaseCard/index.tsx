@@ -2,7 +2,6 @@ import { Avatar, Button, Card, Flex, Image, Typography } from 'antd'
 
 import { useRejectAll } from '../../api/hooks'
 import type { IncomingAllExchanges } from '../../api/models'
-import testImg from '../../assets/testImg.png'
 
 export const ExchangeBaseCard = ({
   setExchange,
@@ -25,7 +24,11 @@ export const ExchangeBaseCard = ({
         <Flex vertical justify="space-between">
           <Flex vertical>
             <Typography.Title level={4}>{data.name}</Typography.Title>
-            <Typography.Text>{data.people.length} человек хотят обменяться</Typography.Text>
+            <Typography.Text>
+              {data.exchangeType === 'FREE'
+                ? `${data.people.length} человек хотят получить книгу`
+                : `${data.people.length} человек хотят обменяться`}
+            </Typography.Text>
             <Avatar.Group>
               {data.people.map((p) => (
                 <a href={`/profile/user/${p.id}`} target="_blank" rel="noreferrer">

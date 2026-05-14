@@ -12,11 +12,12 @@ interface NotificationAttributes {
     transfer_id: number;
     message_type: string;
     is_read: boolean;
+    status_at_creation?: string;
     created_at: string;
 }
 
 
-interface NotificationCreationAttributes extends Optional<NotificationAttributes, 'notification_id' | 'is_read' | 'created_at'> {}
+interface NotificationCreationAttributes extends Optional<NotificationAttributes, 'notification_id' | 'is_read' | 'created_at' | 'status_at_creation' > {}
 
 
 class Notification extends Model<NotificationAttributes, NotificationCreationAttributes> implements NotificationAttributes {
@@ -26,6 +27,7 @@ class Notification extends Model<NotificationAttributes, NotificationCreationAtt
     public transfer_id!: number;
     public message_type!: string;
     public is_read!: boolean;
+    public status_at_creation!: string;
     public created_at!: string;
 
 }
@@ -79,6 +81,10 @@ Notification.init(
             type: DataTypes.BOOLEAN,
             defaultValue: false,
             allowNull: false
+        },
+        status_at_creation: {
+            type: DataTypes.STRING(50),
+            allowNull: true,
         },
         created_at: {
             type: DataTypes.DATEONLY,

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { message } from 'antd'
+import { message, notification } from 'antd'
 
 import service from '../axios'
 import { useUserStore } from '../store/user'
@@ -91,6 +91,18 @@ const getProfile = (id?: string): Promise<UserProfile> =>
 export const useGetNotification = () => useQuery({ queryKey: ['notifications'], queryFn: () => getNotification() })
 
 const getNotification = (): Promise<Notification[]> => service.get('/api/user/notifications')
+
+export const useMarkNotificationAsRead = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (notificationId: number) => service.patch(`/api/user/notifications/read/${notificationId}`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+      queryClient.invalidateQueries({ queryKey: ['user'] })
+    },
+  })
+}
 
 // COMMON
 export const useGetCities = () => useQuery({ queryKey: ['cities'], queryFn: () => getCities() })

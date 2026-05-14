@@ -61,7 +61,7 @@ export const exchangeRepository = {
             },
             include: [
                 {model: User, as: 'initiator', attributes: ['user_id', 'name', 'photo']},
-                {model: Book, as: 'book', attributes: ['book_id', 'name'], include: [
+                {model: Book, as: 'book', attributes: ['book_id', 'name', 'exchangeType'], include: [
                     {model: BookPhoto, as: 'photos', attributes: ['photo_url'], required: false}
                 ]}
             ],

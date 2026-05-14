@@ -64,7 +64,8 @@ export const exchangeService = {
             user_id: init_user_id,
             target_user_id: book.owner_id,
             transfer_id: exchange.transfer_id,
-            message_type: MessageType.EXCHANGE
+            message_type: MessageType.EXCHANGE,
+            status_at_creation: exchange.cur_status
         })
 
         return exchangeRepository.findById(exchange.transfer_id);
@@ -103,11 +104,13 @@ export const exchangeService = {
 
     async getIncomingExchanges(user_id: number) {
         const exchanges = await exchangeRepository.getAllIncomingExchanges(user_id);
+        
 
         const groupedByBook: Record<number, {
             bookId: number,
             bookName: string,
             mainPhoto: string | null,
+            exchangeType: string,
             initiators: any[]
         }> = {};
 
@@ -116,13 +119,13 @@ export const exchangeService = {
             if (!book) {
                 continue;
             }
-
             if(!groupedByBook[book.book_id]) {
                 const mainPhoto = book.photos[0]?.photo_url || null;
                 groupedByBook[book.book_id] = {
                     bookId: book.book_id,
                     bookName: book.name,
                     mainPhoto: mainPhoto,
+                    exchangeType: book.exchangeType,
                     initiators: []
                 }
             }
@@ -144,6 +147,7 @@ export const exchangeService = {
                 id: item.bookId.toString(),
                 name: item.bookName,
                 src: item.mainPhoto || null,
+                exchangeType: item.exchangeType,
                 people: item.initiators
             }))
 
@@ -204,12 +208,23 @@ export const exchangeService = {
         
         const exchange = await exchangeRepository.findById(exchange_id);
         if (exchange) {
-            await notificationRepository.createNotification({ 
-                user_id: user_id === exchange.owner_id ? exchange.initiator_id : exchange.owner_id,
-                target_user_id: user_id === exchange.owner_id ? exchange.owner_id : exchange.initiator_id,
+            const otherUserId = exchange.owner_id === user_id ? exchange.initiator_id : exchange.owner_id;
+            await notificationService.createNotification({
+                user_id: user_id,
+                target_user_id: otherUserId,
                 transfer_id: exchange_id,
-                message_type: MessageType.EXCHANGE
+                message_type: MessageType.EXCHANGE,
+                status_at_creation: exchange.cur_status
             });
+            if (exchange.cur_status === 'COMPLETED_SUCCESS' || exchange.cur_status === 'COMPLETED_PREMATURELY' ) {
+                await notificationService.createNotification({
+                user_id: otherUserId,
+                target_user_id: user_id,
+                transfer_id: exchange_id,
+                message_type: MessageType.EXCHANGE,
+                status_at_creation: exchange.cur_status
+            });
+            }
         }
 
         return { message: 'Exchange`s status update successfully' }; 

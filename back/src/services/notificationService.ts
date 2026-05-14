@@ -11,15 +11,20 @@ export const notificationService = {
         target_user_id: number;
         transfer_id: number;
         message_type: MessageType;
+        status_at_creation?: string;
     }) {
         const notifications = await notificationRepository.createNotification(data);
         await userRepository.incrementNotifications(data.target_user_id);
         return notifications;
     },
 
-    async markAsRead(target_user_id: number) {
-        await notificationRepository.markAllAsRead(target_user_id);
-        await userRepository.resetNotifications(target_user_id);
+    
+    async markOneAsRead(notificationId: number, userId: number) {
+        const affected = await notificationRepository.markAsRead(notificationId, userId);
+        if (affected === 0) {
+            throw new Error('Notification not found or already read');
+        }
+        await userRepository.decrementNotification(userId);
         return { success: true };
     },
 

@@ -47,7 +47,7 @@ export const BookDeliveryInfo = ({ data, setOpen }: { data: Book; setOpen: (open
                 <Typography.Text>{getBookText}</Typography.Text>
                 <Flex gap="small">
                   <Button color="default" variant="solid" onClick={() => setOpen(true)}>
-                    Предложить обмен
+                    {data.exchangeType === 'FREE' ? 'Запросить книгу' : 'Предложить обмен'}
                   </Button>
                   <Button color="default" variant="text" icon={<HeartOutlined />} onClick={handleFavorite} />
                 </Flex>

@@ -127,6 +127,6 @@ interface NotificationResponse {
     createdAt: string;
 }
 
-export const getUserNotifications = async (user_id: number, page: number = 1, limit: number = 20) => {
-    return await userRepository.getNotifications(user_id, page, limit);
+export const getUserNotifications = async (user_id: number) => {
+    return await userRepository.getNotifications(user_id);
 }

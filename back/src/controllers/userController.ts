@@ -90,9 +90,7 @@ export const userController = {
     async getNotifications(req: Request, res: Response) {
         try {
             const userId = (req as any).user.id;
-            const page = parseInt(req.query.page as string) || 1;
-            const limit = parseInt(req.query.limit as string) || 20;
-            const notifications = await getUserNotifications(userId, page, limit);
+            const notifications = await getUserNotifications(userId);
             res.json(notifications);
         } catch (error: any) {
             res.status(404).json({message: error.message});

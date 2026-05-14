@@ -123,9 +123,8 @@ export const userRepository = {
 
     },
 
-    async getNotifications(user_id: number, page: number = 1, limit: number = 20) {
-        const offset = (page - 1) * limit;
-        const {notifications, total} = await notificationRepository.findByTargetUser(user_id, limit, offset);
+    async getNotifications(user_id: number) {
+        const {notifications, total} = await notificationRepository.findByTargetUser(user_id);
         
 
         return notifications.map((n: any) => ({
@@ -136,7 +135,10 @@ export const userRepository = {
             messageType: n.message_type,
             isRead: n.is_read,
             createdAt: n.created_at,
-            curStutus: STATUS_TABS[n.transfer.cur_status as TransferStatus]
+            transferStatus: n.transfer ? n.transfer.cur_status : null,
+            curStutus: n.status_at_creation ? STATUS_TABS[n.status_at_creation as TransferStatus] : (n.transfer ? STATUS_TABS[n.transfer.cur_status as TransferStatus] : 'ENDED'),
+            bookTitle: n.transfer?.book?.name || '',
+            exchangeType: n.transfer?.book?.exchangeType || null
         }))
     },
 
@@ -146,11 +148,10 @@ export const userRepository = {
         )
     },
 
-    async resetNotifications(user_id: number): Promise<void> {
-        await User.update(
-            { notification_number: 0 },
-            { where: { user_id } }
+    async decrementNotification(user_id: number): Promise<void> {
+        await User.decrement(
+            'notification_number', {where: {user_id}}
         );
-    }
+    },
  
 }

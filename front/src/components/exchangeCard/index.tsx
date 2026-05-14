@@ -252,6 +252,14 @@ export const ExchangeCard = ({
         {/* Исходящие заявки – инициатор (только отмена) */}
         {type === 'outcoming' && (
           <Flex gap="small">
+            <Button
+              color="default"
+              disabled={getIsDisabledAccept()}
+              variant="solid"
+              onClick={() => mutate({ activity: 'accept', keptBookIds: selected })}
+            >
+              Обменяться
+            </Button>
             <Button color="orange" variant="outlined" onClick={() => cancel()}>
               Отменить заявку
             </Button>

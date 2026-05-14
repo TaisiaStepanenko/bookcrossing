@@ -7,8 +7,9 @@ export const notificationController = {
     async markAsRead(req: Request, res: Response) {
         try {
             const userId = (req as any).user.id;
-            const result = await notificationService.markAsRead(userId);
-            res.json(result);
+            const notificationId = parseInt(req.params.id);
+            await notificationService.markOneAsRead(notificationId, userId);
+            res.json({ success: true });
         } catch (error: any) {
             res.status(400).json({ message: error.message });
         }
