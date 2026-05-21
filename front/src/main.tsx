@@ -41,6 +41,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               green: '#63A552',
             },
             components: {
+              Rate: {
+                starColor: '#F17300',
+              },
               Button: {
                 borderRadius: 16,
                 colorBgSolid: '#63A552',

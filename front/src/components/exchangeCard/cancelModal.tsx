@@ -29,7 +29,7 @@ export const CancelModal = ({ setOpen, cancel }: { setOpen: (open: boolean) => v
           </li>
         </ul>
         <Flex gap="small">
-          <Button color="orange" variant="solid" onClick={cancel}>
+          <Button color="orange" variant="solid" onClick={handleCancel}>
             Завершить обмен
           </Button>
           <Button onClick={() => setOpen(false)} color="default" variant="outlined">

@@ -63,9 +63,9 @@ export const RegistrationPage = () => {
     if (message === 'User already exists') return 'Пользователь с таким email уже существует'
     if (message === 'Invalid password') return 'Неверный пароль'
     if (message === 'Password must be at least 6 characters') return 'Пароль должен содержать не менее 6 символов'
-    if (message === 'Email is invalid') return 'Некорректный email'
+    if (message === 'Email is invalid') return 'Введите корректную почту'
 
-    return message || 'Произошла ошибка, попробуйте позже'
+    return message
   }
 
   return (

@@ -1,5 +1,5 @@
 import { User, City, Notification, Review, Transfer, Book, BookPhoto } from '../models';
-import {ExchangeType, ExchangeMethod, TransferStatus} from '../constants/enums';
+import {ExchangeType, ExchangeMethod, TransferStatus, BookStatus} from '../constants/enums';
 import {BookCatalogItem} from './bookRepository';
 import {notificationRepository} from './notificationRepository';
 import {STATUS_TABS} from '../constants/enums';
@@ -67,7 +67,7 @@ export const userRepository = {
 
     async getUserBooks(user_id: number) {
         const books = await Book.findAll({
-            where: {owner_id: user_id, status: 'AVAILABLE'},
+            where: {owner_id: user_id, status: {[Op.in]: [BookStatus.AVAILABLE, BookStatus.IN_EXCHANGE]}},
             include: [
                 { model: BookPhoto, as: 'photos', attributes: ['photo_url'], where: {is_main: true}, required: false},
                 {model: User, as: 'owner', attributes: ['user_id', 'name'], include: [{ model: City, as: 'city', attributes: ['city_id', 'name'],}]}
@@ -82,7 +82,8 @@ export const userRepository = {
             src: book.photos?.[0]?.photo_url || null,
             exchangeType: book.exchangeType as ExchangeType,
             exchangeMethod: book.exchangeMethod as ExchangeMethod,
-            isFavorite: false, // для списка книг владельца без текущего пользователя
+            isFavorite: false,
+            status: book.status
         }));
     },
 

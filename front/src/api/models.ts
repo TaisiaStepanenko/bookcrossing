@@ -42,7 +42,20 @@ export interface UserProfile {
   rating: number
   registrationDate: string
   reviewNumber: number
-  reviews: []
+  reviews: {
+    comment: string
+    rating: number
+    reviewDate: string
+    reviewId: number
+    reviewerInfo: {
+      userId: number
+      name: string
+      photo: string
+    }
+    name: string
+    photo: string
+    userId: number
+  }[]
   userBooks: BookCatalogItem[]
   userId: number
 }
@@ -199,6 +212,8 @@ export interface IncomingExchange {
   currentStatusInitiator: TransferStatus
   currentStatusOwner: TransferStatus
   endedDate?: string
+  exchangeType: 'EXCHANGE' | 'FREE'
+  hasReview: boolean
   ownerBook: {
     id: number
     name: string
@@ -244,4 +259,10 @@ export interface ChangeStatus {
   activity: 'accept' | 'cancel'
   keptBookIds?: number[]
   acceptOffer?: number
+}
+
+export interface Review {
+  transferId: number
+  rating: number
+  comment: string
 }

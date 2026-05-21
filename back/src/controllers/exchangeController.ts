@@ -145,7 +145,7 @@ export const exchangeController = {
             }
 
             const {activity, keptBookIds, acceptOffer} = req.body;
-            if (activity != "accept" && activity != "cancel") {
+            if (activity != 'accept' && activity != 'cancel') {
                 return res.status(400).json({ message: 'Invalid activity' });
             }
 

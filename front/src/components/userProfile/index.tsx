@@ -121,7 +121,7 @@ export const UserProfile = ({ id }: { id?: string }) => {
               <Typography.Text strong>({review.rating})</Typography.Text>
             </Flex>
             <Typography.Text>{review.comment}</Typography.Text>
-            <Typography.Text disabled> {new Date(review.review_date).toLocaleDateString()} </Typography.Text>
+            <Typography.Text disabled> {new Date(review.reviewDate).toLocaleDateString()} </Typography.Text>
           </Flex>
         ))}
         {(!reviews || reviews.length === 0) && <Typography.Text disabled>Нет отзывов</Typography.Text>}

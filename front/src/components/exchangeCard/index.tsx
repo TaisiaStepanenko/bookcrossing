@@ -2,11 +2,12 @@ import { useState } from 'react'
 
 import { Avatar, Button, Card, Flex, Image, message, Modal, Tag, Typography } from 'antd'
 
-import { useChangeStatus } from '../../api/hooks'
+import { useAddReview, useChangeStatus } from '../../api/hooks'
 import type { IncomingExchange, TransferStatus } from '../../api/models'
 import Arrows from '../../assets/arrows.png'
 import { OFFER_COUNT } from '../exhange'
 import { CancelModal } from './cancelModal'
+import { ReviewModal } from './reviewModal'
 import { StatusTag } from './statusTag'
 
 import styles from './styles.module.scss'
@@ -19,8 +20,10 @@ export const ExchangeCard = ({
   type: 'incoming' | 'outcoming' | 'running' | 'ended'
 }) => {
   const { mutate } = useChangeStatus(data.id)
+  const { mutateReview } = useAddReview()
   const [selected, setSelected] = useState<number[]>([])
-  const [open, setOpen] = useState(false)
+  const [openCancelModal, setOpenCancelModal] = useState(false)
+  const [openReviewModal, setOpenReviewModal] = useState(false)
 
   const isFree = data.initiatorBooks.length === 0
 
@@ -90,7 +93,7 @@ export const ExchangeCard = ({
       return ['WAITING_TO_BE_SENT', 'SENT', 'RECEIVED'].includes(currentStatusInitiator)
     }
     if (userType === 'OWNER') {
-      return ['WAITING_TO_BE_SENT', 'RECEIVED'].includes(currentStatusOwner)
+      return ['WAITING_TO_BE_SENT', 'SENT', 'RECEIVED'].includes(currentStatusOwner)
     }
 
     return false
@@ -102,13 +105,13 @@ export const ExchangeCard = ({
     if (userType === 'INITIATOR') {
       if (currentStatusInitiator === 'WAITING_TO_BE_SENT') return 'Отправить'
       if (currentStatusInitiator === 'SENT') return 'Подтвердить получение'
-      if (currentStatusInitiator === 'RECEIVED') return 'Завершено'
+      if (currentStatusInitiator === 'RECEIVED') return 'Завершить обмен'
     }
 
     if (userType === 'OWNER') {
       if (currentStatusOwner === 'WAITING_TO_BE_SENT') return 'Отправить'
       if (currentStatusOwner === 'SENT') return 'Подтвердить получение'
-      if (currentStatusOwner === 'RECEIVED') return 'Завершено'
+      if (currentStatusOwner === 'RECEIVED') return 'Завершить обмен'
     }
 
     return ''
@@ -119,12 +122,17 @@ export const ExchangeCard = ({
       { activity: 'cancel' },
       {
         onSuccess: () => {
-          setOpen(false)
+          setOpenCancelModal(false)
         },
       },
     )
 
-  console.log(data)
+  const setReview = () =>
+    mutateReview({
+      onSuccess: () => {
+        setOpenCancelModal(false)
+      },
+    })
 
   return (
     <Card style={{ width: '100%' }}>
@@ -215,7 +223,7 @@ export const ExchangeCard = ({
                 {runningButtonText()}
               </Button>
             )}
-            <Button color="orange" variant="outlined" style={{ width: 156 }} onClick={() => setOpen(true)}>
+            <Button color="orange" variant="outlined" style={{ width: 156 }} onClick={() => setOpenCancelModal(true)}>
               Завершить обмен
             </Button>
             <Typography.Text disabled>
@@ -265,8 +273,19 @@ export const ExchangeCard = ({
             </Button>
           </Flex>
         )}
+
+        {type === 'ended' &&
+          !data.hasReview &&
+          (data.type === 'COMPLETED_SUCCESS' || data.type === 'COMPLETED_PREMATURELY') && (
+            <Flex>
+              <Button color="default" variant="solid" onClick={() => setOpenReviewModal(true)}>
+                Оставить отзыв
+              </Button>
+            </Flex>
+          )}
       </Flex>
-      {open && <CancelModal setOpen={setOpen} cancel={cancel} />}
+      {openCancelModal && <CancelModal setOpen={setOpenCancelModal} cancel={cancel} />}
+      {openReviewModal && <ReviewModal setOpen={setOpenReviewModal} setReview={setReview} transferId={data.id} />}
     </Card>
   )
 }

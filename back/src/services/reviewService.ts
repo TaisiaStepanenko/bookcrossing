@@ -28,7 +28,7 @@ export const reviewService = {
 
         const exchange = await Transfer.findByPk(exchange_id);
 
-        if (!exchange || exchange.cur_status !== 'COMPLETED_SUCCESS') {
+        if (!exchange ||( exchange.cur_status !== 'COMPLETED_SUCCESS' && exchange.cur_status !== 'COMPLETED_PREMATURELY')) {
             throw new Error('Exchange not found or not completed');
         }
 

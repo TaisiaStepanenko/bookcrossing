@@ -7,7 +7,7 @@ if (!process.env.JWT_SECRET) {
 }
 
 export const env = {
-  port: process.env.PORT || 3000,
+  port: process.env.PORT || 3001,
   db: {
     host: process.env.DB_HOST || 'localhost',
     port: Number(process.env.DB_PORT) || 5432,

@@ -19,6 +19,7 @@ import type {
   Notification,
   Registration,
   RegistrationReturn,
+  Review,
   UpdateProfile,
   UserProfile,
 } from './models'
@@ -183,6 +184,19 @@ export const useAddExchange = () => {
 
 const addExchange = (exchange: BookExchange): Promise<void> => {
   return service.post(`/api/exchanges/add/${exchange.targetBookId}`, exchange)
+}
+
+export const useAddReview = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (review: Review) => addReview(review),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['Exchanges'] }),
+  })
+}
+
+const addReview = (review: Review): Promise<void> => {
+  return service.post(`/api/reviews/create`, review)
 }
 
 export const useGetIncomingExchanges = () =>

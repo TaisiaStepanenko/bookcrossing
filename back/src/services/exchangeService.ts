@@ -48,17 +48,7 @@ export const exchangeService = {
         await exchangeRepository.addOfferingBooks(exchange.transfer_id, offeredBooksIds);
 
         
-        await Book.update(
-            { status: BookStatus.IN_EXCHANGE },
-            { where: { book_id: book_id } }
-        );
-
-        if (offeredBooksIds.length > 0) {
-            await Book.update(
-                { status: BookStatus.IN_EXCHANGE },
-                { where: { book_id: { [Op.in]: offeredBooksIds } } }
-            );
-        }
+    
 
         await notificationService.createNotification({
             user_id: init_user_id,
@@ -97,6 +87,7 @@ export const exchangeService = {
             target_user_id: book.owner_id,
             transfer_id: exchange.transfer_id,
             message_type: MessageType.EXCHANGE,
+            status_at_creation: exchange.cur_status
         });
 
         return exchangeRepository.findById(exchange.transfer_id);
@@ -163,23 +154,23 @@ export const exchangeService = {
     },
 
     async getExchanges(user_id: number, type: 'incoming' | 'outcoming' | 'running' | 'ended', book_id?: number) {
-        const exchanges = await exchangeRepository.getExchanges( user_id, type, book_id);
+        const exchanges = await exchangeRepository.getExchanges(user_id, type, book_id);
         
-
-        return exchanges.map((ex: any) => {
+        const result = await Promise.all(exchanges.map(async (ex: any) => {
             const initiator = ex.initiator;
-            const owner = ex.owner
+            const owner = ex.owner;
             const targetBook = ex.book;
             const offeringBooks = ex.offeringBooks || [];
-
+            const hasReview = await exchangeRepository.hasReview(ex.transfer_id, user_id);
+            
             return {
-                id: ex.transfer_id.toString(),
+                id: ex.transfer_id,
                 name: user_id === owner.user_id ? initiator.name : owner.name,
                 avatar: user_id === owner.user_id ? initiator.photo : owner.photo || null,
-                userType: user_id ===owner.user_id ? 'OWNER' : 'INITIATOR',
+                userType: user_id === owner.user_id ? 'OWNER' : 'INITIATOR',
                 bookCount: ex.offerType,
                 ownerBook: {
-                    id: targetBook.book_id.toString(),
+                    id: targetBook.book_id,
                     name: targetBook.name || '',
                     src: targetBook.photos?.[0]?.photo_url || ''
                 },
@@ -188,13 +179,15 @@ export const exchangeService = {
                     name: oBook.book?.name || '',
                     src: oBook.book?.photos?.[0]?.photo_url || ''
                 })),
-
                 type: ex.cur_status,
                 currentStatusInitiator: ex.current_status_initiator,
-                currentStatusOwner: ex.current_status_owner
-                
-            }
-        })
+                currentStatusOwner: ex.current_status_owner,
+                exchangeType: targetBook?.exchangeType || null,
+                hasReview
+            };
+        }));
+        
+        return result;
     },
 
 
