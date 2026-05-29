@@ -25,7 +25,7 @@ export const BookCard = ({ item }: { item: BookCatalogItem }) => {
     }
   }
 
-  const imageUrl = item.src ? `${import.meta.env.VITE_API_URL}${item.src}` : BookImg
+  const imageUrl = item.src ? `${process.env.VITE_API_URL}${item.src}` : BookImg
 
   return (
     <Flex vertical style={{ position: 'relative' }} onClick={() => navigate(`/book/${item.id}`)}>

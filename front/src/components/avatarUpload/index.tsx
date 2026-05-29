@@ -113,7 +113,7 @@ export const AddPhotos = ({
             if (file.existingUrl && file.url && !file.url.startsWith('blob:')) {
               return {
                 ...file,
-                url: `${import.meta.env.VITE_API_URL}${file.existingUrl}`,
+                url: `${process.env.VITE_API_URL}${file.existingUrl}`,
               }
             }
 

@@ -52,7 +52,7 @@ export const AddBookPage = () => {
           uid: `existing-${index}-${Date.now()}`,
           name: photo.url.split('/').pop() || `photo-${index}`,
           status: 'done',
-          url: `${import.meta.env.VITE_API_URL}${photo.url}`, // Полный URL для отображения
+          url: `${process.env.VITE_API_URL}${photo.url}`, // Полный URL для отображения
           existingUrl: photo.url, // Сохраняем относительный URL для отправки на сервер
           isMain: photo.isMain,
         }))

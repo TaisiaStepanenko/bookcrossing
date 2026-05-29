@@ -34,7 +34,7 @@ export const EditProfilePage = () => {
           uid: `existing-avatar`,
           name: avatar.split('/').pop() || `avatar`,
           status: 'done',
-          url: `${import.meta.env.VITE_API_URL}${avatar}`, // Полный URL для отображения
+          url: `${process.env.VITE_API_URL}${avatar}`, // Полный URL для отображения
           existingUrl: avatar, // Сохраняем относительный URL для отправки на сервер
         },
       ]

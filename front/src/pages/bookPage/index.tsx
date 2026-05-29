@@ -4,13 +4,13 @@ import { useParams } from 'react-router-dom'
 import { Breadcrumb, Col, Flex, Row, Spin, Typography } from 'antd'
 import dayjs from 'dayjs'
 
-import { useGetBook } from '../../api/hooks.ts'
-import { BookCard } from '../../components/bookCard/index.tsx'
+import { useGetBook } from '../../api/hooks'
+import { BookCard } from '../../components/bookCard'
 import { BookDeliveryInfo } from '../../components/bookDeliveryInfo.tsx'
 import { BookInfo } from '../../components/bookInfo'
 import { Container } from '../../components/common/container'
-import { ExchangeWithModal } from '../../components/exhange/index.tsx'
-import { PhotoGallery } from '../../components/photoGallery/index.tsx'
+import { ExchangeWithModal } from '../../components/exhange'
+import { PhotoGallery } from '../../components/photoGallery'
 
 export const BookPage = () => {
   const [open, setOpen] = useState(false)
@@ -33,7 +33,7 @@ export const BookPage = () => {
       <Flex style={{ gap: 24, width: '100%' }} vertical>
         <Breadcrumb
           separator=">"
-          items={[{ title: 'Глвная', href: '/' }, { title: 'Каталог', href: '/catalog' }, { title: 'Книга' }]}
+          items={[{ title: 'Главная', href: '/' }, { title: 'Каталог', href: '/catalog' }, { title: 'Книга' }]}
         />
         <Row style={{ width: '100%' }} gutter={20}>
           <Col span={6}>

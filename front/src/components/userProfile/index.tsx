@@ -33,7 +33,7 @@ export const UserProfile = ({ id }: { id?: string }) => {
           <Col span={id ? 20 : 24}>
             <Flex gap={'large'} style={{ width: '100%' }}>
               <Flex vertical gap={'small'}>
-                <Image width={285} height={285} src={photo ? `${import.meta.env.VITE_API_URL}${photo}` : UserImg} />
+                <Image width={285} height={285} src={photo ? `${process.env.VITE_API_URL}${photo}` : UserImg} />
                 {!id && (
                   <Button color="default" variant="solid" onClick={() => navigate('/profile/edit')}>
                     Редактировать профиль
@@ -109,7 +109,7 @@ export const UserProfile = ({ id }: { id?: string }) => {
             <Flex gap={'small'} align="center" key={review.review_id}>
               <Avatar
                 src={
-                  review.reviewerInfo.photo ? `${import.meta.env.VITE_API_URL}${review.reviewerInfo.photo}` : undefined
+                  review.reviewerInfo.photo ? `${process.env.VITE_API_URL}${review.reviewerInfo.photo}` : undefined
                 }
               >
                 {review.reviewerInfo.name?.[0] || '?'}

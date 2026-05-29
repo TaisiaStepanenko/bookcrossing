@@ -36,7 +36,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
   return (
     <Image.PreviewGroup>
       <Flex vertical gap="small" className={styles['img-box']}>
-        <Image width={'100%'} height={436} alt="svg image" src={`${import.meta.env.VITE_API_URL}${mainPicture}`} />
+        <Image width={'100%'} height={436} alt="svg image" src={`${process.env.VITE_API_URL}${mainPicture}`} />
         {secondPicture && (
           <Flex gap="small">
             {secondPicture && (
@@ -44,7 +44,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
                 width={'calc(100% / 3)'}
                 height={88}
                 alt="svg image"
-                src={`${import.meta.env.VITE_API_URL}${secondPicture}`}
+                src={`${process.env.VITE_API_URL}${secondPicture}`}
                 style={{ objectFit: 'cover', border: undefined }}
               />
             )}
@@ -53,7 +53,7 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
                 width={'calc(100% / 3)'}
                 height={88}
                 alt="svg image"
-                src={`${import.meta.env.VITE_API_URL}${thirdPicture}`}
+                src={`${process.env.VITE_API_URL}${thirdPicture}`}
                 style={{ objectFit: 'cover', border: undefined }}
               />
             )}

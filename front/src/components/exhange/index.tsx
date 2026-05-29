@@ -54,10 +54,10 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
   const removeBook = (id: number) => {
     setSelected((prev) => prev.filter((b) => b.id !== id))
   }
-  const imageUrl = book.url ? `${import.meta.env.VITE_API_URL}${book.url}` : BookImg
+  const imageUrl = book.url ? `${process.env.VITE_API_URL}${book.url}` : BookImg
   const handleExchange = () => {
     if (!offerType) {
-      setError('Сначала выберите книги для обмена и тип обмена')
+      setError('Сначала выберете книги для обмена и тип обмена')
 
       return
     }
@@ -172,9 +172,9 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
             required
             placeholder="Выберете способ обмена"
             style={{ width: '100%' }}
-            options={Object.keys(OFFER_TYPE).map((val: any) => ({
+            options={Object.keys(OFFER_TYPE).map((val) => ({
               value: val,
-              label: OFFER_TYPE[val],
+              label: OFFER_TYPE[val as keyof typeof OFFER_TYPE],
             }))}
           />
         )}
@@ -241,7 +241,7 @@ const GetBook = ({
                 onSelect({
                   id: item.id,
                   name: item.name,
-                  url: `${import.meta.env.VITE_API_URL}${item.src}`,
+                  url: `${process.env.VITE_API_URL}${item.src}`,
                 })
               }
             >
@@ -249,7 +249,7 @@ const GetBook = ({
                 height={240}
                 width={178}
                 alt="book"
-                src={`${import.meta.env.VITE_API_URL}${item.src}`}
+                src={`${process.env.VITE_API_URL}${item.src}`}
                 style={{ borderRadius: 16 }}
               />
               <Typography.Title level={5}>{item.name}</Typography.Title>

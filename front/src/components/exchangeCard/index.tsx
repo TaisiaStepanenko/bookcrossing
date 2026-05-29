@@ -20,7 +20,7 @@ export const ExchangeCard = ({
   type: 'incoming' | 'outcoming' | 'running' | 'ended'
 }) => {
   const { mutate } = useChangeStatus(data.id)
-  const { mutateReview } = useAddReview()
+  const { mutate: mutateReview } = useAddReview()
   const [selected, setSelected] = useState<number[]>([])
   const [openCancelModal, setOpenCancelModal] = useState(false)
   const [openReviewModal, setOpenReviewModal] = useState(false)
@@ -128,7 +128,7 @@ export const ExchangeCard = ({
     )
 
   const setReview = () =>
-    mutateReview({
+    mutateReview({} as any, {
       onSuccess: () => {
         setOpenCancelModal(false)
       },
@@ -138,7 +138,7 @@ export const ExchangeCard = ({
     <Card style={{ width: '100%' }}>
       <Flex vertical gap="middle">
         <Flex gap="small">
-          <Avatar src={`${import.meta.env.VITE_API_URL}${data.avatar}`} />
+          <Avatar src={`${process.env.VITE_API_URL}${data.avatar}`} />
           <Flex vertical>
             <Typography.Title style={{ margin: 0 }} level={4}>
               {getTitle()}
@@ -159,13 +159,13 @@ export const ExchangeCard = ({
           </Flex>
         </Flex>
         <Flex gap="small" align="center">
-          <Image src={`${import.meta.env.VITE_API_URL}${data.ownerBook.src}`} height={240} width={178} />
+          <Image src={`${process.env.VITE_API_URL}${data.ownerBook.src}`} height={240} width={178} />
           {!isFree && <Image src={Arrows} height={80} width={69} />}
           {!isFree &&
             data.initiatorBooks.map((book) => (
               <Image
                 onClick={() => type === 'incoming' && data.type === 'WAITING_RESPONSE' && onChangeSelected(book.id)}
-                src={`${import.meta.env.VITE_API_URL}${book.src}`}
+                src={`${process.env.VITE_API_URL}${book.src}`}
                 className={selected.includes(book.id) ? styles.selected : undefined}
                 preview={false}
                 key={book.id}
