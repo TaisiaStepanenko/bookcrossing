@@ -33,6 +33,7 @@ export interface BookCatalogItem {
     exchangeType: ExchangeType;
     exchangeMethod: ExchangeMethod;
     isFavorite: boolean;
+    isMyBook: boolean
 }
 
 export interface BookEdit {
@@ -170,6 +171,8 @@ export const BookRepository = {
         const items: BookCatalogItem[] = rows.map((book: any) => {
             const owner = book.owner;
             const mainPhoto = book.photos?.[0];
+            const isMyBook = user_id === owner?.user_id;
+
 
             let isFavorite = false;
             if (user_id && book.favorites) {
@@ -186,7 +189,8 @@ export const BookRepository = {
                 src: mainPhoto?.photo_url || null,
                 exchangeType: book.exchangeType as ExchangeType,
                 exchangeMethod: book.exchangeMethod as ExchangeMethod,
-                isFavorite: isFavorite
+                isFavorite,
+                isMyBook
             };
         });
         return {
@@ -329,7 +333,8 @@ export const BookRepository = {
             src: book.photos?.[0]?.photo_url || null,
             exchangeType: book.exchangeType as ExchangeType,
             exchangeMethod: book.exchangeMethod as ExchangeMethod,
-            isFavorite: false
+            isFavorite: false,
+            isMyBook: true
         }));
     },
 

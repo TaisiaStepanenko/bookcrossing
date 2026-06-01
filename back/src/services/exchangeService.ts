@@ -1,7 +1,7 @@
 
 import { error } from "console";
-import { BookStatus, MessageType, OfferType } from "../constants/enums"
-import { Book, OfferingBook, User } from "../models";
+import { BookStatus, MessageType, OfferType, TransferStatus } from "../constants/enums"
+import { Book, OfferingBook, Transfer, User } from "../models";
 import { Op } from "sequelize";
 import { exchangeRepository } from "../repositories/exchangeRepository";
 import { notificationService } from "./notificationService";
@@ -24,6 +24,22 @@ export const exchangeService = {
 
         if (book.status != BookStatus.AVAILABLE) {
             throw new Error('Target book is not available');
+        }
+
+        const existingExchange = await Transfer.findOne(
+            {where: {book_id, initiator_id: init_user_id, 
+                cur_status: {
+                    [Op.notIn]: [
+                        TransferStatus.CANCELLED,
+                        TransferStatus.COMPLETED_SUCCESS,
+                        TransferStatus.COMPLETED_PREMATURELY
+                    ]
+                }
+            }}
+        )
+
+        if (existingExchange) {
+            throw new Error('You already have an active exchange request for this book');
         }
 
         const offeredBooks = await Book.findAll({
@@ -73,6 +89,22 @@ export const exchangeService = {
 
         if (book.status != BookStatus.AVAILABLE) {
             throw new Error('Target book is not available');
+        }
+
+        const existingExchange = await Transfer.findOne(
+            {where: {book_id, initiator_id: init_user_id, 
+                cur_status: {
+                    [Op.notIn]: [
+                        TransferStatus.CANCELLED,
+                        TransferStatus.COMPLETED_SUCCESS,
+                        TransferStatus.COMPLETED_PREMATURELY
+                    ]
+                }
+            }}
+        )
+
+        if (existingExchange) {
+            throw new Error('You already have an active exchange request for this book');
         }
 
         const exchange = await exchangeRepository.addBookExchange(

@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { bookService } from '../services/bookService';
 import { Place, ExchangeMethod, BookCondition, ExchangeType, BookCover } from '../constants/enums';
 import { verifyToken } from '../utils/jwt';
+import { Book } from '../models';
 
 const catalogFilterSchema = z.object({
     cityId: z.number().int().positive().optional(),
@@ -113,7 +114,15 @@ export const bookController = {
             }
             const bookId = parseInt(req.params.id);
             if (!bookId) {
-                return  res.status(400).json({ message: 'Invalid book id' });
+                return res.status(400).json({ message: 'Invalid book id' });
+            }
+
+            const book = await Book.findByPk(bookId);
+            if (!book) {
+                return res.status(404).json({ message: 'Book not found' });
+            }
+            if (book.owner_id === userId) {
+                return res.status(400).json({ message: 'Нельзя добавить в избранное свою книгу' });
             }
 
             const result = await bookService.addFavBook(userId, bookId);
