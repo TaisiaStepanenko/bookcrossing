@@ -55,6 +55,16 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
     setSelected((prev) => prev.filter((b) => b.id !== id))
   }
   const imageUrl = book.url ? `${process.env.VITE_API_URL}${book.url}` : BookImg
+
+  const getErrorMessage = (error: any): string => {
+    const msg = error?.response?.data?.message
+
+    if (msg === 'You already have an active exchange request for this book') {
+      return 'У вас уже есть активная заявка на эту книгу'
+    }
+
+    return msg || 'Ошибка при отправке обмена'
+  }
   const handleExchange = () => {
     if (!offerType) {
       setError('Сначала выберете книги для обмена и тип обмена')
@@ -77,7 +87,7 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
           close()
         },
         onError: (error: any) => {
-          message.error(error?.response?.data?.message || 'Ошибка при отправке обмена')
+          message.error(getErrorMessage(error))
         },
       },
     )

@@ -28,13 +28,16 @@ export const ExchangeCard = ({
   const isFree = data.initiatorBooks.length === 0
 
   const onChangeSelected = (id: number) => {
-    if (OFFER_COUNT[data.bookCount] < selected.length) {
-      return null
+    const maxAllowed = OFFER_COUNT[data.bookCount]
+    const isSelected = selected.includes(id)
+
+    if (isSelected) {
+      setSelected((prev) => prev.filter((v) => v !== id))
     } else {
-      if (!selected.includes(id)) {
-        setSelected([...selected, id])
+      if (selected.length < maxAllowed) {
+        setSelected((prev) => [...prev, id])
       } else {
-        setSelected(selected.filter((v) => v !== id))
+        message.warning(`Можно выбрать не более ${maxAllowed} книг`)
       }
     }
   }
@@ -145,16 +148,16 @@ export const ExchangeCard = ({
             </Typography.Title>
             {getEndedText() ? (
               <Typography.Text disabled>{getEndedText()}</Typography.Text>
+            ) : isFree ? (
+              <Typography.Text>Книга отдаётся даром</Typography.Text>
             ) : (
-              isFree && (
-                <Typography.Text>
-                  {data.bookCount === 'THREE'
-                    ? 'Все 3 книги на 1 вашу'
-                    : data.bookCount === 'TWO'
-                      ? '2 из 3 книг на выбор'
-                      : '1 из 3 книг на выбор'}
-                </Typography.Text>
-              )
+              <Typography.Text>
+                {data.bookCount === 'THREE'
+                  ? 'Все 3 книги на 1 вашу'
+                  : data.bookCount === 'TWO'
+                    ? '2 из 3 книг на выбор'
+                    : '1 из 3 книг на выбор'}
+              </Typography.Text>
             )}
           </Flex>
         </Flex>

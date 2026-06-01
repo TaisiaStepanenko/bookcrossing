@@ -73,7 +73,9 @@ export const RegistrationPage = () => {
       <div style={{ width: '100%' }}>
         <Row gutter={[20, 20]}>
           <Col span={24}>
-            <Typography.Title>Регистрация</Typography.Title>
+            <Typography.Title level={2} style={{ fontSize: '28px', fontWeight: 600, marginBottom: 4 }}>
+              Регистрация
+            </Typography.Title>
             <Typography.Link style={{ color: 'black', textDecoration: 'underline' }} onClick={() => navigate('/login')}>
               Есть аккаунт?
             </Typography.Link>
@@ -159,11 +161,7 @@ export const RegistrationPage = () => {
             </Col>
           )}
           <Col span={24}>
-            <Button
-              color="primary"
-              onClick={onSave}
-              // disabled={isShowError && Boolean(isError)}
-            >
+            <Button type="primary" color="primary" onClick={onSave}>
               Зарегистрироваться
             </Button>
           </Col>

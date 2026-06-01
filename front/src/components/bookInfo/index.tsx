@@ -6,10 +6,9 @@ import { BookStatus } from '../bookStatus'
 export const BookInfo = ({ data }: { data: Book }) => (
   <Col span={12}>
     <Flex vertical gap="small">
-      <BookStatus status={data.exchangeMethod} />
+      <BookStatus exchangeType={data.exchangeType} exchangeMethod={data.exchangeMethod} />{' '}
       <Typography.Title level={2}>{data.name}</Typography.Title>
       <Typography.Text disabled>{data.author}</Typography.Text>
-
       <Flex justify="space-between">
         <Typography.Text disabled>Состояние</Typography.Text>
         <Typography.Text>{BOOK_CONDITION[data.condition].ru}</Typography.Text>

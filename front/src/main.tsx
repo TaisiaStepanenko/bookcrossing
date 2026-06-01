@@ -35,7 +35,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <ConfigProvider
           theme={{
             token: {
-              colorPrimary: '#000F08',
+              colorPrimary: '#63A552',
               colorTextSecondary: '#7D8B9B',
               orange: '#F17300',
               green: '#63A552',
@@ -52,7 +52,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 defaultColor: '#63A552',
               },
               Pagination: {
-                borderRadius: '50%',
+                borderRadius: 50,
                 itemActiveBg: '#63A552',
                 colorPrimary: '#FFFFFF',
                 colorBorderSecondary: '#63A552',

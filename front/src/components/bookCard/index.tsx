@@ -29,21 +29,23 @@ export const BookCard = ({ item }: { item: BookCatalogItem }) => {
 
   return (
     <Flex vertical style={{ position: 'relative' }} onClick={() => navigate(`/book/${item.id}`)}>
-      <Button
-        type="primary"
-        size="small"
-        shape="circle"
-        icon={<HeartOutlined />}
-        style={{
-          position: 'absolute',
-          top: 12,
-          right: 24,
-          background: item.isFavorite ? '#A30B37' : 'inherit',
-          border: undefined,
-          boxShadow: 'unset',
-        }}
-        onClick={handleFavorite}
-      />
+      {!item.isMyBook && (
+        <Button
+          type="primary"
+          size="small"
+          shape="circle"
+          icon={<HeartOutlined />}
+          style={{
+            position: 'absolute',
+            top: 12,
+            right: 24,
+            background: item.isFavorite ? '#A30B37' : 'inherit',
+            border: undefined,
+            boxShadow: 'unset',
+          }}
+          onClick={handleFavorite}
+        />
+      )}
       <img
         width={285}
         height={359}
@@ -54,7 +56,11 @@ export const BookCard = ({ item }: { item: BookCatalogItem }) => {
           e.currentTarget.src = BookImg
         }}
       />
-      <BookStatus style={{ position: 'absolute', top: 12, left: 12 }} status={item.exchangeMethod} />
+      <BookStatus
+        exchangeType={item.exchangeType}
+        exchangeMethod={item.exchangeMethod}
+        style={{ position: 'absolute', top: 12, left: 12 }}
+      />
       <Typography.Title level={5}>{item.name}</Typography.Title>
       <Typography.Text type="secondary">{item.author}</Typography.Text>
       <Typography.Text type="secondary">

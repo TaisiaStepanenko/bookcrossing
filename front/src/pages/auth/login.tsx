@@ -71,12 +71,14 @@ export const LoginPage = () => {
       <div style={{ width: '100%' }}>
         <Row gutter={[20, 20]}>
           <Col span={24}>
-            <Typography.Title>Авторизация</Typography.Title>
+            <Typography.Title level={2} style={{ fontSize: '28px', fontWeight: 600, marginBottom: 4 }}>
+              Авторизация
+            </Typography.Title>
             <Typography.Link
               style={{ color: 'black', textDecoration: 'underline' }}
               onClick={() => navigate('/registration')}
             >
-              Регистрация
+              Ещё нет аккаунта?
             </Typography.Link>
           </Col>
 
@@ -117,7 +119,7 @@ export const LoginPage = () => {
             </Col>
           )}
           <Col span={24}>
-            <Button color="primary" onClick={onSave}>
+            <Button type="primary" color="primary" onClick={onSave}>
               Войти
             </Button>
           </Col>

@@ -1,10 +1,10 @@
 import type { CSSProperties } from 'react'
 
-import { TruckOutlined } from '@ant-design/icons'
+import { GiftOutlined, TruckOutlined } from '@ant-design/icons'
 
 import { Divider, Flex, Tag } from 'antd'
 
-import type { ExchangeMethod } from '../../api/models'
+import type { ExchangeMethod, ExchangeType } from '../../api/models'
 
 const STATUS = {
   DELIVERY: { color: '#648DE5', text: 'Только доставка', icon: <TruckOutlined /> },
@@ -12,20 +12,35 @@ const STATUS = {
   ALL: { color: '#648DE5', text: 'Личная встреча и Доставка', icon: <TruckOutlined /> },
 }
 
-export const BookStatus = ({ status, style }: { status: ExchangeMethod; style?: CSSProperties }) => {
-  const { color, icon, text } = STATUS[status]
+const FREE_STATUS = { color: '#A30B37', text: 'Отдам даром', icon: <GiftOutlined /> }
 
-  if (style)
+export const BookStatus = ({
+  exchangeType,
+  exchangeMethod,
+  style,
+}: {
+  exchangeType: ExchangeType
+  exchangeMethod: ExchangeMethod
+  style?: CSSProperties
+}) => {
+  if (exchangeType === 'FREE') {
+    const { color, icon, text } = FREE_STATUS
+
     return (
-      <Tag color={color} icon={icon} variant="solid" style={style}>
-        {text}
-      </Tag>
+      <Flex gap="small" align="center" wrap>
+        <Tag color={color} icon={icon} variant="solid" style={style}>
+          {text}
+        </Tag>
+      </Flex>
     )
+  }
+
+  const { color, icon, text } = STATUS[exchangeMethod]
 
   return (
     <>
       <Flex gap="small" align="center" wrap>
-        <Tag color={color} icon={icon} variant="solid">
+        <Tag color={color} icon={icon} variant="solid" style={style}>
           {text}
         </Tag>
       </Flex>

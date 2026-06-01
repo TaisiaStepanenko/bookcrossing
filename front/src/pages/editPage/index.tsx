@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { Button, Col, Flex, Row, Typography, type UploadFile } from 'antd'
+import { Button, Col, Flex, message, Row, Typography, type UploadFile } from 'antd'
 import dayjs from 'dayjs'
 
 import { useGetCities, useGetProfile, useUpdateProfile } from '../../api/hooks'
@@ -20,6 +20,12 @@ export const EditProfilePage = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([])
   const { mutateAsync } = useUpdateProfile()
   const cities = useGetCities()
+
+  const isInvalidEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@([^\s@.,]+\.)+[^\s@.,]{2,}$/
+
+    return !emailRegex.test(email)
+  }
 
   useEffect(() => {
     if (query.data) {
@@ -47,6 +53,12 @@ export const EditProfilePage = () => {
 
   const onSave = () => {
     const birthday = data.birthdayDate ? dayjs(data.birthdayDate).format('YYYY-MM-DD') : ''
+
+    if (data.email && isInvalidEmail(data.email)) {
+      message.error('Введите корректный email')
+
+      return
+    }
 
     const formData = new FormData()
 

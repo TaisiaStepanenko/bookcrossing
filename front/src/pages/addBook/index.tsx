@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { Button, Col, Flex, message, Row, Typography, type UploadFile } from 'antd'
 
-import { useAddBook, useGetBook, useUpdateBook } from '../../api/hooks'
+import { useAddBook, useGetBook, useUpdateBook, useUserInfo } from '../../api/hooks'
 import { BOOK_CONDITION, BOOK_COVER, type BookEdit, EXCHANGE_METHOD, EXCHANGE_TYPE } from '../../api/models'
 import addBook from '../../assets/addBook.png'
 import { AddPhotos } from '../../components/addPhotos'
@@ -27,9 +27,16 @@ export const AddBookPage = () => {
   const { data: bookData, isLoading } = useGetBook(Number(id))
   const { mutate: addMutate, isPending: isAdding } = useAddBook()
   const { mutate: updateMutate, isPending: isUpdating } = useUpdateBook()
+  const { data: userInfo } = useUserInfo()
 
   useEffect(() => {
     if (bookData && isEditMode) {
+      if (!bookData.isMy) {
+        message.error('Вы не можете редактировать эту книгу')
+        navigate('/catalog')
+
+        return
+      }
       setData({
         name: bookData.name,
         author: bookData.author,
@@ -46,7 +53,6 @@ export const AddBookPage = () => {
         obtainingMethod: bookData.obtainingMethod,
       })
 
-      // Конвертируем существующие фото в формат UploadFile
       if (bookData.photos && bookData.photos.length > 0) {
         const existingFiles: UploadFile[] = bookData.photos.map((photo, index) => ({
           uid: `existing-${index}-${Date.now()}`,
@@ -60,10 +66,9 @@ export const AddBookPage = () => {
         setFileList(existingFiles)
       }
     }
-  }, [bookData, isEditMode])
+  }, [bookData, isEditMode, navigate])
 
   const onSubmit = () => {
-    // Валидация обязательных полей
     if (
       !data.name ||
       !data.author ||

@@ -86,6 +86,7 @@ export interface BookCatalogItem {
   exchangeType: ExchangeType
   exchangeMethod: ExchangeMethod
   isFavorite: boolean
+  isMyBook: boolean
   id: number
 }
 

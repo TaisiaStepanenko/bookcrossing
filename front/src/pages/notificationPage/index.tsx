@@ -20,6 +20,12 @@ const getNotificationText = (n: Notification): string => {
       return `Пользователь ${userName} оставил отзыв об обмене книги${book}.`
     }
   } else if (n.messageType === 'EXCHANGE') {
+    if (n.transferStatus === 'CANCELLED' && n.userId) {
+      return `Пользователь ${userName} отклонил вашу заявку на книгу${book}.`
+    }
+    if (n.transferStatus === 'COMPLETED_PREMATURELY') {
+      return `Обмен книги${book} досрочно завершён.`
+    }
     switch (n.curStutus) {
       case 'NEW':
         if (n.transferStatus === 'WAITING_RESPONSE') {
