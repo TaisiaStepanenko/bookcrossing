@@ -33,7 +33,7 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
     <Flex vertical>
       <div className={styles.container}>
         <Header className={styles.header}>
-          <Flex align="flex-end" gap="middle">
+          <Flex align="center" justify="center" gap="middle">
             <div>
               <img src={Logo} style={{ cursor: 'pointer' }} onClick={() => navigate('/catalog')} />
             </div>

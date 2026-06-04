@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 import { Button, Col, DatePicker, Row, Select, Typography } from 'antd'
+import { sign } from 'crypto'
 import dayjs from 'dayjs'
 
 import { useGetCities, useRegistration } from '../../api/hooks'
@@ -76,7 +77,10 @@ export const RegistrationPage = () => {
             <Typography.Title level={2} style={{ fontSize: '28px', fontWeight: 600, marginBottom: 4 }}>
               Регистрация
             </Typography.Title>
-            <Typography.Link style={{ color: 'black', textDecoration: 'underline' }} onClick={() => navigate('/login')}>
+            <Typography.Link
+              style={{ color: 'black', textDecoration: 'underline', fontSize: '16px', marginBottom: '12px' }}
+              onClick={() => navigate('/login')}
+            >
               Есть аккаунт?
             </Typography.Link>
           </Col>
@@ -104,7 +108,7 @@ export const RegistrationPage = () => {
               onChange={(v) => onChange('birthday_date', v)}
               value={data.birthday_date ? dayjs(data.birthday_date) : null}
               label="Дата рождения"
-              placeholder="Введите дату"
+              placeholder="Выберите дату"
               format="DD.MM.YYYY"
               required
             />
@@ -135,7 +139,7 @@ export const RegistrationPage = () => {
               label="Город"
               required
               placeholder="Введите город"
-              style={{ width: '100%' }}
+              style={{ width: '100%', fontSize: '16px' }}
               options={(cities.data || []).map(({ cityId, name }) => ({ value: cityId, label: name }))}
             />
           </Col>
@@ -161,7 +165,12 @@ export const RegistrationPage = () => {
             </Col>
           )}
           <Col span={24}>
-            <Button type="primary" color="primary" onClick={onSave}>
+            <Button
+              type="primary"
+              color="primary"
+              style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2, marginTop: '12px' }}
+              onClick={onSave}
+            >
               Зарегистрироваться
             </Button>
           </Col>

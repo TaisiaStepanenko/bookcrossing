@@ -51,7 +51,11 @@ export const BookCard = ({ item }: { item: BookCatalogItem }) => {
         height={359}
         alt="basic"
         src={imageUrl}
-        style={{ borderRadius: 16 }}
+        style={{
+          borderRadius: 16,
+          objectFit: 'cover',
+          backgroundColor: '#f5f5f5',
+        }}
         onError={(e) => {
           e.currentTarget.src = BookImg
         }}
@@ -61,7 +65,9 @@ export const BookCard = ({ item }: { item: BookCatalogItem }) => {
         exchangeMethod={item.exchangeMethod}
         style={{ position: 'absolute', top: 12, left: 12 }}
       />
-      <Typography.Title level={5}>{item.name}</Typography.Title>
+      <Typography.Title level={5} style={{ maxWidth: '285px' }}>
+        {item.name}
+      </Typography.Title>
       <Typography.Text type="secondary">{item.author}</Typography.Text>
       <Typography.Text type="secondary">
         <EnvironmentOutlined /> {item.place}

@@ -45,10 +45,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 starColor: '#F17300',
               },
               Button: {
-                borderRadius: 16,
+                borderRadius: 50,
                 colorBgSolid: '#63A552',
                 colorBorder: '#63A552',
-
                 defaultColor: '#63A552',
               },
               Pagination: {

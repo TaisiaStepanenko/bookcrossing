@@ -72,7 +72,7 @@ export const UserProfile = ({ id }: { id?: string }) => {
           </Col>
           {id && (
             <Col span={4}>
-              <Card style={{ width: '100%' }}>
+              <Card style={{ width: '200px' }}>
                 <Typography.Title level={5}>Действия на сайте</Typography.Title>
                 <Flex justify="space-between">
                   <Typography.Text disabled>Завершённые обмены</Typography.Text>
@@ -108,9 +108,7 @@ export const UserProfile = ({ id }: { id?: string }) => {
           <Flex vertical gap={'middle'}>
             <Flex gap={'small'} align="center" key={review.review_id}>
               <Avatar
-                src={
-                  review.reviewerInfo.photo ? `${process.env.VITE_API_URL}${review.reviewerInfo.photo}` : undefined
-                }
+                src={review.reviewerInfo.photo ? `${process.env.VITE_API_URL}${review.reviewerInfo.photo}` : undefined}
               >
                 {review.reviewerInfo.name?.[0] || '?'}
               </Avatar>

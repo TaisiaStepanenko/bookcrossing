@@ -71,15 +71,25 @@ export const ExchangeCard = ({
   }
 
   const getEndedText = () => {
-    if (data.type === 'COMPLETED_SUCCESS') {
-      return `Успешно завершён ${new Date(data.endedDate || '').toLocaleDateString()}`
-    } else if (data.type === 'COMPLETED_PREMATURELY') {
-      return `Досрочно завершён ${new Date(data.endedDate || '').toLocaleDateString()}`
-    } else if (data.type === 'CANCELLED') {
-      return 'Отменен'
-    } else {
-      return ''
+    const status = data.type?.toUpperCase()
+
+    if (status === 'COMPLETED_SUCCESS' || status === 'COMPLETED' || status === 'ENDED') {
+      if (data.endedDate && !isNaN(new Date(data.endedDate).getTime())) {
+        return `Успешно завершён ${new Date(data.endedDate).toLocaleDateString()}`
+      }
+
+      return 'Успешно завершён'
     }
+    if (status === 'COMPLETED_PREMATURELY') {
+      if (data.endedDate && !isNaN(new Date(data.endedDate).getTime())) {
+        return `Досрочно завершён ${new Date(data.endedDate).toLocaleDateString()}`
+      }
+
+      return 'Досрочно завершён'
+    }
+    if (status === 'CANCELLED') return 'Отменен'
+
+    return ''
   }
 
   const getIsDisabledAccept = () =>
@@ -92,32 +102,50 @@ export const ExchangeCard = ({
 
     if (type !== 'WAITING_TO_BE_SENT' && type !== 'SENT' && type !== 'RECEIVED') return false
 
-    if (userType === 'INITIATOR') {
-      return ['WAITING_TO_BE_SENT', 'SENT', 'RECEIVED'].includes(currentStatusInitiator)
-    }
-    if (userType === 'OWNER') {
-      return ['WAITING_TO_BE_SENT', 'SENT', 'RECEIVED'].includes(currentStatusOwner)
-    }
+    if (isFree) {
+      if (userType === 'OWNER') {
+        return currentStatusOwner === 'WAITING_TO_BE_SENT'
+      }
+      if (userType === 'INITIATOR') {
+        return currentStatusInitiator === 'SENT'
+      }
 
-    return false
+      return false
+    } else {
+      // Обмен
+      if (userType === 'INITIATOR') {
+        return ['WAITING_TO_BE_SENT', 'SENT', 'RECEIVED'].includes(currentStatusInitiator)
+      }
+      if (userType === 'OWNER') {
+        return ['WAITING_TO_BE_SENT', 'SENT', 'RECEIVED'].includes(currentStatusOwner)
+      }
+
+      return false
+    }
   }
 
   const runningButtonText = () => {
     const { currentStatusInitiator, currentStatusOwner, userType } = data
 
-    if (userType === 'INITIATOR') {
-      if (currentStatusInitiator === 'WAITING_TO_BE_SENT') return 'Отправить'
-      if (currentStatusInitiator === 'SENT') return 'Подтвердить получение'
-      if (currentStatusInitiator === 'RECEIVED') return 'Завершить обмен'
-    }
+    if (isFree) {
+      if (userType === 'OWNER' && currentStatusOwner === 'WAITING_TO_BE_SENT') return 'Отправить'
+      if (userType === 'INITIATOR' && currentStatusInitiator === 'SENT') return 'Подтвердить получение'
 
-    if (userType === 'OWNER') {
-      if (currentStatusOwner === 'WAITING_TO_BE_SENT') return 'Отправить'
-      if (currentStatusOwner === 'SENT') return 'Подтвердить получение'
-      if (currentStatusOwner === 'RECEIVED') return 'Завершить обмен'
-    }
+      return ''
+    } else {
+      if (userType === 'INITIATOR') {
+        if (currentStatusInitiator === 'WAITING_TO_BE_SENT') return 'Отправить'
+        if (currentStatusInitiator === 'SENT') return 'Подтвердить получение'
+        if (currentStatusInitiator === 'RECEIVED') return 'Завершить обмен'
+      }
+      if (userType === 'OWNER') {
+        if (currentStatusOwner === 'WAITING_TO_BE_SENT') return 'Отправить'
+        if (currentStatusOwner === 'SENT') return 'Подтвердить получение'
+        if (currentStatusOwner === 'RECEIVED') return 'Завершить обмен'
+      }
 
-    return ''
+      return ''
+    }
   }
 
   const cancel = () =>
@@ -205,12 +233,14 @@ export const ExchangeCard = ({
               </Typography.Title>
               <StatusTag status={data.currentStatusOwner} />
             </Flex>
-            <Flex vertical gap="small">
-              <Typography.Title style={{ margin: 0 }} level={4}>
-                Текущий статус
-              </Typography.Title>
-              <StatusTag status={data.currentStatusInitiator} />
-            </Flex>
+            {!isFree && (
+              <Flex vertical gap="small">
+                <Typography.Title style={{ margin: 0 }} level={4}>
+                  Текущий статус
+                </Typography.Title>
+                <StatusTag status={data.currentStatusInitiator} />
+              </Flex>
+            )}
           </Flex>
         )}
         {type === 'running' && (
@@ -249,7 +279,7 @@ export const ExchangeCard = ({
                 Обменяться
               </Button>
             )}
-            {isFree && (
+            {isFree && data.type === 'WAITING_RESPONSE' && (
               <Button color="default" variant="solid" onClick={() => mutate({ activity: 'accept' })}>
                 Принять заявку
               </Button>

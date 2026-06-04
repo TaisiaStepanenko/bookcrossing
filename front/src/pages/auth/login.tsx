@@ -75,7 +75,7 @@ export const LoginPage = () => {
               Авторизация
             </Typography.Title>
             <Typography.Link
-              style={{ color: 'black', textDecoration: 'underline' }}
+              style={{ color: 'black', textDecoration: 'underline', fontSize: '16px', marginBottom: '12px' }}
               onClick={() => navigate('/registration')}
             >
               Ещё нет аккаунта?
@@ -119,8 +119,13 @@ export const LoginPage = () => {
             </Col>
           )}
           <Col span={24}>
-            <Button type="primary" color="primary" onClick={onSave}>
-              Войти
+            <Button
+              type="primary"
+              color="primary"
+              style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2, marginTop: '12px' }}
+              onClick={onSave}
+            >
+              Авторизоваться
             </Button>
           </Col>
         </Row>
