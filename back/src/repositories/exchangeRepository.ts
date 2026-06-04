@@ -168,9 +168,10 @@ export const exchangeRepository = {
                 }
 
                 const updatedExchange = await Transfer.findByPk(exchange_id);
-                if (updatedExchange?.current_status_initiator === TransferStatus.SENT && updatedExchange?.current_status_owner === TransferStatus.SENT) {
+                const offeringBooks = await OfferingBook.findAll({ where: { transfer_id: exchange_id } });
+                if ((updatedExchange?.current_status_initiator === TransferStatus.SENT || offeringBooks.length === 0) && updatedExchange?.current_status_owner === TransferStatus.SENT) {
                     await Transfer.update(
-                        { cur_status: TransferStatus.SENT },
+                        { cur_status: TransferStatus.SENT, current_status_initiator: TransferStatus.SENT },
                         { where: { transfer_id: exchange_id } }
                     );
                 }
@@ -189,7 +190,8 @@ export const exchangeRepository = {
                 }
 
                 const updatedExchange = await Transfer.findByPk(exchange_id);
-                if (updatedExchange?.current_status_initiator === TransferStatus.RECEIVED && updatedExchange?.current_status_owner === TransferStatus.RECEIVED) {
+                const offeringBooks = await OfferingBook.findAll({ where: { transfer_id: exchange_id } });
+                if (updatedExchange?.current_status_initiator === TransferStatus.RECEIVED && (updatedExchange?.current_status_owner === TransferStatus.RECEIVED || offeringBooks.length === 0)) {
                     await Transfer.update(
                         {
                             current_status_initiator: TransferStatus.COMPLETED_SUCCESS,
@@ -199,7 +201,7 @@ export const exchangeRepository = {
                         { where: { transfer_id: exchange_id } }
                     );
                     await Book.update(
-                        { owner_id: exchange.initiator_id, status: BookStatus.EXCHANGED },
+                        { status: BookStatus.EXCHANGED },
                         { where: { book_id: exchange.book_id } }
                     );
                     const offeringBooks = await OfferingBook.findAll({ where: { transfer_id: exchange_id } });
