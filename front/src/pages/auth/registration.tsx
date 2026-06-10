@@ -73,12 +73,12 @@ export const RegistrationPage = () => {
     <AuthContainer>
       <div style={{ width: '100%' }}>
         <Row gutter={[20, 20]}>
-          <Col span={24}>
-            <Typography.Title level={2} style={{ fontSize: '28px', fontWeight: 600, marginBottom: 4 }}>
+          <Col span={24} style={{ marginBottom: '12px' }}>
+            <Typography.Title level={2} style={{ fontSize: '28px', fontWeight: 600, marginBottom: 4, lineHeight: 1.2 }}>
               Регистрация
             </Typography.Title>
             <Typography.Link
-              style={{ color: 'black', textDecoration: 'underline', fontSize: '16px', marginBottom: '12px' }}
+              style={{ color: '#6B6B6B', textDecoration: 'underline', fontSize: '16px' }}
               onClick={() => navigate('/login')}
             >
               Есть аккаунт?

@@ -46,6 +46,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               },
               Button: {
                 borderRadius: 50,
+                fontSize: 18,
+                lineHeight: 1.2,
                 colorBgSolid: '#63A552',
                 colorBorder: '#63A552',
                 defaultColor: '#63A552',

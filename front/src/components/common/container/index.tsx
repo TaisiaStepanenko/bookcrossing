@@ -16,7 +16,7 @@ import styles from './style.module.scss'
 
 const { Header, Content, Footer } = Layout
 
-export const Container = ({ children }: { children: React.ReactNode }) => {
+export const Container = ({ children, fullHeight = true }: { children: React.ReactNode; fullHeight?: boolean }) => {
   useInitSearchCity()
 
   const navigate = useNavigate()
@@ -31,7 +31,7 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <Flex vertical>
-      <div className={styles.container}>
+      <div className={styles.container} style={{ gap: 0 }}>
         <Header className={styles.header}>
           <Flex align="center" justify="center" gap="middle">
             <div>
@@ -79,11 +79,13 @@ export const Container = ({ children }: { children: React.ReactNode }) => {
           </Space>
         </Header>
 
-        <Content className={styles.content}>{children}</Content>
+        <Content className={styles.content} style={fullHeight ? {} : { minHeight: 'auto' }}>
+          {children}
+        </Content>
       </div>
       <Footer
         style={{
-          marginTop: 56,
+          marginTop: 285,
           height: 586,
           background: '#F0F4FA',
           display: 'flex',
