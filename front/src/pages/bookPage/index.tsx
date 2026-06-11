@@ -29,7 +29,7 @@ export const BookPage = () => {
   const firstPhotoUrl = data.photos?.[0]?.url || ''
 
   return (
-    <Container>
+    <Container fullHeight={false}>
       <Flex style={{ width: '100%' }} vertical>
         <Breadcrumb
           style={{ fontSize: 16, marginBottom: 32 }}
@@ -37,22 +37,28 @@ export const BookPage = () => {
           items={[{ title: 'Главная', href: '/' }, { title: 'Каталог', href: '/catalog' }, { title: `${data.name}` }]}
         />
         <Flex vertical gap={64}>
-          <Flex style={{ gap: 40 }}>
+          <Flex
+            style={{
+              gap: 40,
+            }}
+          >
             <Col span={7} style={{ maxWidth: 320 }}>
               <PhotoGallery photos={data?.photos || []} />
             </Col>
             <BookInfo data={data} />
             <BookDeliveryInfo data={data} setOpen={setOpen} />
           </Flex>
-          <Flex vertical gap={20}>
-            <Typography.Title level={5} style={{ fontWeight: 600 }}>
-              Описание
-            </Typography.Title>
-            <Typography.Text style={{ fontSize: 16 }}>{data.description}</Typography.Text>
-            <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
-              {dayjs(new Date(data.registrationDate)).format('DD.MM.YYYY')}
-            </Typography.Text>
-          </Flex>
+          {data.description && (
+            <Flex vertical gap={20}>
+              <Typography.Title level={5} style={{ fontWeight: 600 }}>
+                Описание
+              </Typography.Title>
+              <Typography.Text style={{ fontSize: 16 }}>{data.description}</Typography.Text>
+              <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
+                {dayjs(new Date(data.registrationDate)).format('DD.MM.YYYY')}
+              </Typography.Text>
+            </Flex>
+          )}
           {!data.isMy && (
             <Flex vertical gap={20}>
               <Typography.Title level={5} style={{ fontWeight: 600 }}>

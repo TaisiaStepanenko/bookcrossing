@@ -77,8 +77,8 @@ export const EditProfilePage = () => {
   }
 
   return (
-    <Container>
-      <Flex align="center">
+    <Container fullHeight={false}>
+      <Flex align="center" style={{ height: '702px', marginTop: 69 }}>
         <div className={styles.card}>
           <div style={{ width: '285px' }}>
             <img src={changeProfile} alt="" className={styles['card-img']} />
@@ -87,7 +87,9 @@ export const EditProfilePage = () => {
             <div style={{ width: '100%' }}>
               <Row gutter={[20, 20]}>
                 <Col span={24}>
-                  <Typography.Title>Профиль пользователя</Typography.Title>
+                  <Typography.Title level={2} style={{ fontWeight: 600, marginBottom: 12, lineHeight: 1.2 }}>
+                    Профиль пользователя
+                  </Typography.Title>
                 </Col>
                 <Col span={24}>
                   <AddPhotos fileList={fileList} setFileList={setFileList} />

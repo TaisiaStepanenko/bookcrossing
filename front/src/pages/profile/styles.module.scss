@@ -1,3 +1,7 @@
 .profile-filter-selected {
     color: #63A552
 }
+
+.active-icon {
+  filter: brightness(0) saturate(100%) invert(58%) sepia(59%) saturate(476%) hue-rotate(55deg) brightness(95%) contrast(90%);
+}

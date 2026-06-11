@@ -61,10 +61,7 @@ export const CatalogPage = () => {
               <Flex vertical>
                 <Flex vertical style={{ gap: '32px' }}>
                   <Flex vertical style={{ gap: '16px' }}>
-                    <Typography.Title
-                      level={3}
-                      style={{ fontSize: 20, lineHeight: 1.2, fontWeight: 600, color: '#000F08' }}
-                    >
+                    <Typography.Title level={3} style={{ lineHeight: 1.2, fontWeight: 600, color: '#000F08' }}>
                       Где искать
                     </Typography.Title>
                     {placeOptions.map(({ value, label }) => {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 
 import { CameraOutlined, DeleteOutlined } from '@ant-design/icons'
 
-import { type GetProp, Image, message, Upload, type UploadFile, type UploadProps } from 'antd'
+import { Flex, type GetProp, Image, message, Typography, Upload, type UploadFile, type UploadProps } from 'antd'
 
 declare module 'antd' {
   interface UploadFile {
@@ -105,15 +105,16 @@ export const AddPhotos = ({
 
   const uploadButton = (
     <button style={{ border: 0, background: 'none' }} type="button">
-      <CameraOutlined />
+      <CameraOutlined style={{ fontSize: 32, color: '#7D8B9B' }} />
       <div style={{ marginTop: 8 }}>Загрузить</div>
     </button>
   )
 
   return (
     <>
-      <div>
-        <div style={{ marginBottom: 8 }}>Фотографии книги (максимальное количество фотографий 7)</div>
+      <Flex vertical gap={4}>
+        <Typography.Title level={3}>Фотографии</Typography.Title>
+        <Typography.Text style={{ fontSize: 16, color: '#6B6B6B' }}>Не более 7</Typography.Text>
         <Upload
           listType="picture-card"
           fileList={fileList.map((file) => {
@@ -135,10 +136,10 @@ export const AddPhotos = ({
         >
           {fileList.length >= 7 ? null : uploadButton}
         </Upload>
-        <div style={{ marginTop: 8, color: '#666', fontSize: 12 }}>
+        <div style={{ color: '#666', fontSize: 14 }}>
           Поддерживаются форматы JPG, PNG. Максимальный размер файла 5MB
         </div>
-      </div>
+      </Flex>
 
       {previewImage && (
         <Image

@@ -72,6 +72,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 fontSizeHeading3: 20,
                 fontSizeHeading2: 28,
                 fontSizeHeading5: 24,
+                fontSize: 16,
                 lineHeight: 1.2,
               },
               Checkbox: {

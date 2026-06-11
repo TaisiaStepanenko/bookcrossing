@@ -21,12 +21,14 @@ export const BookInfo = ({ data }: { data: Book }) => (
         </Typography.Text>
         <Typography.Text style={{ fontSize: 16 }}>{BOOK_CONDITION[data.condition].ru}</Typography.Text>
       </Flex>
-      <Flex justify="space-between" className={styles.infoRow}>
-        <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
-          Дефекты
-        </Typography.Text>
-        <Typography.Text style={{ fontSize: 16 }}>{data.defects}</Typography.Text>
-      </Flex>
+      {data.defects && (
+        <Flex justify="space-between" className={styles.infoRow}>
+          <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
+            Дефекты
+          </Typography.Text>
+          <Typography.Text style={{ fontSize: 16 }}>{data.defects}</Typography.Text>
+        </Flex>
+      )}
       <Flex justify="space-between" className={styles.infoRow}>
         <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
           Жанр
@@ -39,24 +41,30 @@ export const BookInfo = ({ data }: { data: Book }) => (
         </Typography.Text>
         <Typography.Text style={{ fontSize: 16 }}>{BOOK_COVER[data.cover].ru}</Typography.Text>
       </Flex>
-      <Flex justify="space-between" className={styles.infoRow}>
-        <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
-          Издательство
-        </Typography.Text>
-        <Typography.Text style={{ fontSize: 16 }}>{data.publisherHouse}</Typography.Text>
-      </Flex>
-      <Flex justify="space-between" className={styles.infoRow}>
-        <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
-          Год издания
-        </Typography.Text>
-        <Typography.Text style={{ fontSize: 16 }}>{data.year}</Typography.Text>
-      </Flex>
-      <Flex justify="space-between" className={styles.infoRow}>
-        <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
-          Серия
-        </Typography.Text>
-        <Typography.Text style={{ fontSize: 16 }}>{data.series}</Typography.Text>
-      </Flex>
+      {data.publisherHouse && (
+        <Flex justify="space-between" className={styles.infoRow}>
+          <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
+            Издательство
+          </Typography.Text>
+          <Typography.Text style={{ fontSize: 16 }}>{data.publisherHouse}</Typography.Text>
+        </Flex>
+      )}
+      {data.year && (
+        <Flex justify="space-between" className={styles.infoRow}>
+          <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
+            Год издания
+          </Typography.Text>
+          <Typography.Text style={{ fontSize: 16 }}>{data.year}</Typography.Text>
+        </Flex>
+      )}
+      {data.series && (
+        <Flex justify="space-between" className={styles.infoRow}>
+          <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
+            Серия
+          </Typography.Text>
+          <Typography.Text style={{ fontSize: 16 }}>{data.series}</Typography.Text>
+        </Flex>
+      )}
     </Flex>
   </Col>
 )

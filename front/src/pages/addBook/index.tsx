@@ -98,7 +98,6 @@ export const AddBookPage = () => {
     // Подготавливаем данные для отправки
     const submitData: any = { ...data }
 
-    // Добавляем year как число
     if (submitData.year) {
       submitData.year = Number(submitData.year)
     }
@@ -170,8 +169,8 @@ export const AddBookPage = () => {
   }
 
   return (
-    <Container>
-      <Flex align="center">
+    <Container fullHeight={false}>
+      <Flex align="center" style={{ height: '702px', marginTop: 69 }}>
         <div className={styles.card}>
           <div style={{ width: '285px' }}>
             <img src={addBook} alt="" className={styles['card-img']} />
@@ -181,9 +180,11 @@ export const AddBookPage = () => {
               <div style={{ width: '100%' }}>
                 {page === 1 && (
                   <Row gutter={[20, 20]}>
-                    <Col span={24}>
-                      <Typography.Title>{isEditMode ? 'Редактирование книги' : 'Добавление книги'}</Typography.Title>
-                      <Typography.Link style={{ color: 'black' }}>Информация о книге</Typography.Link>
+                    <Col span={24} style={{ marginBottom: 12 }}>
+                      <Typography.Title level={2} style={{ fontWeight: 600, marginBottom: 4, lineHeight: 1.2 }}>
+                        {isEditMode ? 'Редактирование книги' : 'Добавление книги'}
+                      </Typography.Title>
+                      <Typography.Link style={{ color: '#6B6B6B', fontSize: 16 }}>Информация о книге</Typography.Link>
                     </Col>
 
                     <Col span={12}>
@@ -269,12 +270,24 @@ export const AddBookPage = () => {
                         rows={3}
                       />
                     </Col>
-                    <Col span={24}>
+                    <Col span={24} style={{ marginTop: '12px' }}>
                       <Flex gap="small">
-                        <Button color="default" variant="outlined" onClick={() => navigate(-1)}>
+                        <Button
+                          color="default"
+                          variant="outlined"
+                          style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+                          onClick={() => navigate(-1)}
+                        >
                           Назад
                         </Button>
-                        <Button color="default" variant="solid" onClick={() => setPage(2)} disabled={isPending}>
+
+                        <Button
+                          color="primary"
+                          type="primary"
+                          style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+                          onClick={() => setPage(2)}
+                          disabled={isPending}
+                        >
                           Далее
                         </Button>
                       </Flex>
@@ -283,9 +296,13 @@ export const AddBookPage = () => {
                 )}
                 {page === 2 && (
                   <Row gutter={[20, 20]}>
-                    <Col span={24}>
-                      <Typography.Title>{isEditMode ? 'Редактирование книги' : 'Добавление книги'}</Typography.Title>
-                      <Typography.Link style={{ color: 'black' }}>Информация о книге</Typography.Link>
+                    <Col span={24} style={{ marginBottom: 12 }}>
+                      <Typography.Title level={2} style={{ fontWeight: 600, marginBottom: 12, lineHeight: 1.2 }}>
+                        {isEditMode ? 'Редактирование книги' : 'Добавление книги'}
+                      </Typography.Title>
+                      <Typography.Link style={{ color: '#6B6B6B', fontSize: 16 }}>
+                        Информация о состоянии экземпляра и доставке
+                      </Typography.Link>
                     </Col>
 
                     <Col span={12}>
@@ -349,12 +366,24 @@ export const AddBookPage = () => {
                         setDeletedPhotos={setDeletedPhotos}
                       />
                     </Col>
-                    <Col span={24}>
+                    <Col span={24} style={{ marginTop: '12px' }}>
                       <Flex gap="small">
-                        <Button color="default" variant="outlined" onClick={() => setPage(1)} disabled={isPending}>
+                        <Button
+                          color="default"
+                          variant="outlined"
+                          style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+                          onClick={() => setPage(1)}
+                          disabled={isPending}
+                        >
                           Назад
                         </Button>
-                        <Button color="default" variant="solid" onClick={onSubmit} loading={isPending}>
+                        <Button
+                          color="primary"
+                          type="primary"
+                          style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+                          onClick={onSubmit}
+                          loading={isPending}
+                        >
                           {isEditMode ? 'Сохранить' : 'Добавить'}
                         </Button>
                       </Flex>
