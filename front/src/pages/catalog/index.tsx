@@ -52,67 +52,86 @@ export const CatalogPage = () => {
   return (
     <Container>
       <div style={{ minHeight: '100%', width: '100%' }}>
-        <Typography.Title>Каталог</Typography.Title>
+        <Typography.Title style={{ fontSize: 40, lineHeight: 1.2, width: 156, marginBottom: 32 }}>
+          Каталог
+        </Typography.Title>
         <Flex>
-          <Flex style={{ width: 285, height: 595 }}>
-            <Card>
+          <Flex>
+            <Card style={{ width: 285, height: 524, borderRadius: 20 }} styles={{ body: { padding: '32px 24px' } }}>
               <Flex vertical>
-                <Flex vertical>
-                  <Typography.Title level={3}>Где искать</Typography.Title>
-                  {placeOptions.map(({ value, label }) => {
-                    const needsPlace = value === PLACES.MY_PLACE.en || value === PLACES.NEAR.en
-                    const isDisabled = needsPlace && !searchCity
+                <Flex vertical style={{ gap: '32px' }}>
+                  <Flex vertical style={{ gap: '16px' }}>
+                    <Typography.Title
+                      level={3}
+                      style={{ fontSize: 20, lineHeight: 1.2, fontWeight: 600, color: '#000F08' }}
+                    >
+                      Где искать
+                    </Typography.Title>
+                    {placeOptions.map(({ value, label }) => {
+                      const needsPlace = value === PLACES.MY_PLACE.en || value === PLACES.NEAR.en
+                      const isDisabled = needsPlace && !searchCity
 
-                    return (
+                      return (
+                        <Checkbox
+                          key={value}
+                          checked={filters.place?.includes(value)}
+                          onChange={() => togglePlace(value)}
+                          style={{ fontSize: 16, lineHeight: 1.2 }}
+                          disabled={isDisabled}
+                        >
+                          {label}
+                        </Checkbox>
+                      )
+                    })}
+                  </Flex>
+
+                  <Flex vertical style={{ gap: '16px' }}>
+                    <Typography.Title level={3} style={{ fontSize: 20, lineHeight: 1.2 }}>
+                      Состояние книги
+                    </Typography.Title>
+                    {conditionOptions.map(({ value, label }) => (
                       <Checkbox
                         key={value}
-                        checked={filters.place?.includes(value)}
-                        onChange={() => togglePlace(value)}
-                        disabled={isDisabled}
+                        checked={filters.condition?.includes(value)}
+                        style={{ fontSize: 16, lineHeight: 1.2 }}
+                        onChange={() =>
+                          setFilters({
+                            ...filters,
+                            condition: toggleFilter(filters.condition, value),
+                          })
+                        }
                       >
                         {label}
                       </Checkbox>
-                    )
-                  })}
-
-                  <Typography.Title level={3}>Способ получения</Typography.Title>
-                  {exchangeTypeOptions.map(({ value, label }) => (
-                    <Checkbox
-                      key={value}
-                      checked={filters.exchange?.includes(value)}
-                      onChange={() =>
-                        setFilters({
-                          ...filters,
-                          exchange: toggleFilter(filters.exchange, value),
-                        })
-                      }
-                    >
-                      {label}
-                    </Checkbox>
-                  ))}
-
-                  <Typography.Title level={3}>Состояние книги</Typography.Title>
-                  {conditionOptions.map(({ value, label }) => (
-                    <Checkbox
-                      key={value}
-                      checked={filters.condition?.includes(value)}
-                      onChange={() =>
-                        setFilters({
-                          ...filters,
-                          condition: toggleFilter(filters.condition, value),
-                        })
-                      }
-                    >
-                      {label}
-                    </Checkbox>
-                  ))}
+                    ))}
+                  </Flex>
+                  <Flex vertical style={{ gap: '16px' }}>
+                    <Typography.Title level={3} style={{ fontSize: 20, lineHeight: 1.2 }}>
+                      Тип обмена
+                    </Typography.Title>
+                    {exchangeTypeOptions.map(({ value, label }) => (
+                      <Checkbox
+                        key={value}
+                        checked={filters.exchange?.includes(value)}
+                        style={{ fontSize: 16, lineHeight: 1.2 }}
+                        onChange={() =>
+                          setFilters({
+                            ...filters,
+                            exchange: toggleFilter(filters.exchange, value),
+                          })
+                        }
+                      >
+                        {label}
+                      </Checkbox>
+                    ))}
+                  </Flex>
                 </Flex>
               </Flex>
             </Card>
           </Flex>
-          <Row gutter={[20, 20]} style={{ width: '100%', marginLeft: 20 }}>
+          <Row gutter={[20, 40]} style={{ width: '100%', marginLeft: 10 }}>
             {data?.items.map((item) => (
-              <Col xs={8} key={item.id}>
+              <Col key={item.id} style={{ maxWidth: 305 }}>
                 <BookCard item={item} />
               </Col>
             ))}

@@ -18,7 +18,9 @@ export const CustomSelect = ({ label, required, ...props }: SelectProps & { requ
     <Flex vertical>
       {label && (
         <Flex>
-          <Typography.Text type="secondary">{label}</Typography.Text>
+          <Typography.Text type="secondary" style={{ fontSize: 16 }}>
+            {label}
+          </Typography.Text>
           {required && <Typography.Text style={{ color: 'var(--ant-red)' }}>*</Typography.Text>}
         </Flex>
       )}

@@ -1,46 +1,83 @@
-
-
 @font-face {
-  font-family: 'PT Root UI';
-  src: url('src/assets/fonts/Ptrootuimedium.woff2') format('woff2'),
-    url('src/assets/fonts/Ptrootuimedium.woff') format('woff'),
-    url('src/assets/fonts/Ptrootuimedium.ttf') format('truetype');
-  font-weight: 500;
+  font-family: 'Onest';
+  src: url('src/assets/fonts/Onest-Thin.ttf') format('truetype');
+  font-weight: 100;
   font-style: normal;
 }
-
 @font-face {
-  font-family: 'PT Root UI';
-  src: url('src/assets/fonts/Ptrootuilight.woff2') format('woff2'),
-    url('src/assets/fonts/Ptrootuilight.woff') format('woff'),
-    url('src/assets/fonts/Ptrootuilight.ttf') format('truetype');
+  font-family: 'Onest';
+  src: url('src/assets/fonts/Onest-ExtraLight.ttf') format('truetype');
+  font-weight: 200;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Onest';
+  src: url('src/assets/fonts/Onest-Light.ttf') format('truetype');
   font-weight: 300;
   font-style: normal;
 }
+@font-face {
+  font-family: 'Onest';
+  src: url('src/assets/fonts/Onest-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Onest';
+  src: url('src/assets/fonts/Onest-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Onest';
+  src: url('src/assets/fonts/Onest-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Onest';
+  src: url('src/assets/fonts/Onest-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Onest';
+  src: url('src/assets/fonts/Onest-ExtraBold.ttf') format('truetype');
+  font-weight: 800;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Onest';
+  src: url('src/assets/fonts/Onest-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Onest';
+  src: url('src/assets/fonts/Onest-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
 
 @font-face {
-  font-family: 'PT Root UI';
-  src: url('src/assets/fonts/Ptrootui.woff2') format('woff2'),
-    url('src/assets/fonts/Ptrootui.woff') format('woff'),
-    url('src/assets/fonts/Ptrootui.ttf') format('truetype');
+  font-family: 'Docker';
+  src: url('src/assets/fonts/dockerone.ttf') format('truetype');
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'PT Root UI';
-  src: url('src/assets/fonts/Ptrootuibold.woff2') format('woff2'),
-    url('src/assets/fonts/Ptrootuibold.woff') format('woff'),
-    url('src/assets/fonts/Ptrootuibold.ttf') format('truetype');
-  font-weight: 700;
+  font-family: 'Docker';
+  src: url('src/assets/fonts/dockertwo.ttf') format('truetype');
+  font-weight: 600;
   font-style: normal;
 }
-
+// dockerthree.ttf – Bold (700)
 @font-face {
-  font-family: 'ZyfraIcons';
-  src: url('src/assets/fonts/ZyfraIcons.woff2') format('woff2');
+  font-family: 'Docker';
+  src: url('src/assets/fonts/dockerthree.ttf') format('truetype');
+  font-weight: 700;
   font-style: normal;
-  font-weight: normal;
 }
 
 #root {
@@ -68,5 +105,30 @@ h1, h2, h3, h4, h5, h6 {
 
 img {
   object-fit: contain;
-  // background-color: #72a56124
 }
+
+
+.ant-checkbox {
+  width: 20px;
+  height: 20px;
+}
+
+.ant-checkbox::after {
+  left: 30%;
+  top: 45%;
+}
+
+.ant-checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+}
+.ant-checkbox + span {
+  padding-left: 10px;
+}
+
+.ant-card-body {
+  padding: 24, 32;
+}
+
+
+

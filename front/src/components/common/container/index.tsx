@@ -32,7 +32,7 @@ export const Container = ({ children, fullHeight = true }: { children: React.Rea
   return (
     <Flex vertical>
       <div className={styles.container} style={{ gap: 0 }}>
-        <Header className={styles.header}>
+        <Header className={styles.header} style={{ marginBottom: 40 }}>
           <Flex align="center" justify="center" gap="middle">
             <div>
               <img src={Logo} style={{ cursor: 'pointer' }} onClick={() => navigate('/catalog')} />

@@ -36,13 +36,15 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
   return (
     <Image.PreviewGroup>
       <Flex vertical gap="small" className={styles['img-box']}>
-        <Image width={'100%'} height={436} alt="svg image" src={`${process.env.VITE_API_URL}${mainPicture}`} />
+        <Flex style={{ backgroundColor: '#7F7F7F' }}>
+          <Image width="100%" height={436} alt="svg image" src={`${process.env.VITE_API_URL}${mainPicture}`} />
+        </Flex>
         {secondPicture && (
-          <Flex gap="small">
+          <Flex gap="small" style={{ width: '100%' }}>
             {secondPicture && (
               <Image
                 width={'calc(100% / 3)'}
-                height={88}
+                height={100}
                 alt="svg image"
                 src={`${process.env.VITE_API_URL}${secondPicture}`}
                 style={{ objectFit: 'cover', border: undefined }}
@@ -51,15 +53,15 @@ export const PhotoGallery: React.FC<PhotoGalleryProps> = ({ photos }) => {
             {thirdPicture && (
               <Image
                 width={'calc(100% / 3)'}
-                height={88}
+                height={100}
                 alt="svg image"
                 src={`${process.env.VITE_API_URL}${thirdPicture}`}
                 style={{ objectFit: 'cover', border: undefined }}
               />
             )}
             {remainingCount > 0 && (
-              <Flex className={styles['no-img']} align="center" justify="center">
-                <Typography.Title level={3} style={{ color: 'white', margin: 0 }}>
+              <Flex className={styles['no-img']} align="center" justify="center" style={{ height: 100 }}>
+                <Typography.Title style={{ color: 'white', margin: 0, fontSize: 32, fontWeight: 500 }}>
                   +{remainingCount}
                 </Typography.Title>
               </Flex>

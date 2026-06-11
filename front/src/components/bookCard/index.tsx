@@ -37,10 +37,16 @@ export const BookCard = ({ item }: { item: BookCatalogItem }) => {
           icon={<HeartOutlined />}
           style={{
             position: 'absolute',
-            top: 12,
-            right: 24,
+            top: 11,
+            right: 12,
+            height: 29,
+            width: 29,
+            padding: 0,
+            display: 'inline-flex',
+            alignItems: 'center',
+            justifyContent: 'center',
             background: item.isFavorite ? '#A30B37' : 'inherit',
-            border: undefined,
+            border: 'none',
             boxShadow: 'unset',
           }}
           onClick={handleFavorite}
@@ -52,8 +58,9 @@ export const BookCard = ({ item }: { item: BookCatalogItem }) => {
         alt="basic"
         src={imageUrl}
         style={{
-          borderRadius: 16,
+          borderRadius: 20,
           objectFit: 'cover',
+          marginBottom: 16,
           backgroundColor: '#f5f5f5',
         }}
         onError={(e) => {
@@ -65,11 +72,13 @@ export const BookCard = ({ item }: { item: BookCatalogItem }) => {
         exchangeMethod={item.exchangeMethod}
         style={{ position: 'absolute', top: 12, left: 12 }}
       />
-      <Typography.Title level={5} style={{ maxWidth: '285px' }}>
+      <Typography.Title level={3} style={{ maxWidth: '285px', marginBottom: 6, lineHeight: 1 }}>
         {item.name}
       </Typography.Title>
-      <Typography.Text type="secondary">{item.author}</Typography.Text>
-      <Typography.Text type="secondary">
+      <Typography.Text type="secondary" style={{ maxWidth: '285px', marginBottom: 12, fontSize: 16, lineHeight: 1 }}>
+        {item.author}
+      </Typography.Text>
+      <Typography.Text type="secondary" style={{ maxWidth: '285px', fontSize: 16, color: '#000F08', lineHeight: 1 }}>
         <EnvironmentOutlined /> {item.place}
       </Typography.Text>
     </Flex>

@@ -30,31 +30,42 @@ export const BookPage = () => {
 
   return (
     <Container>
-      <Flex style={{ gap: 24, width: '100%' }} vertical>
+      <Flex style={{ width: '100%' }} vertical>
         <Breadcrumb
+          style={{ fontSize: 16, marginBottom: 32 }}
           separator=">"
-          items={[{ title: 'Главная', href: '/' }, { title: 'Каталог', href: '/catalog' }, { title: 'Книга' }]}
+          items={[{ title: 'Главная', href: '/' }, { title: 'Каталог', href: '/catalog' }, { title: `${data.name}` }]}
         />
-        <Row style={{ width: '100%' }} gutter={20}>
-          <Col span={6}>
-            <PhotoGallery photos={data?.photos || []} />
-          </Col>
-          <BookInfo data={data} />
-          <BookDeliveryInfo data={data} setOpen={setOpen} />
-        </Row>
-        <Typography.Title level={5}>Описание</Typography.Title>
-        <Typography.Text>{data.description}</Typography.Text>
-        <Typography.Text disabled>{dayjs(new Date(data.registrationDate)).format('DD.MM.YYYY')}</Typography.Text>
-        {!data.isMy && (
-          <>
-            <Typography.Title level={5}>Другие предложения пользователя</Typography.Title>
-            <Flex gap={'middle'}>
-              {data.otherBooks.map((item) => (
-                <BookCard item={item} key={item.id} />
-              ))}
+        <Flex vertical gap={64}>
+          <Flex style={{ gap: 40 }}>
+            <Col span={7} style={{ maxWidth: 320 }}>
+              <PhotoGallery photos={data?.photos || []} />
+            </Col>
+            <BookInfo data={data} />
+            <BookDeliveryInfo data={data} setOpen={setOpen} />
+          </Flex>
+          <Flex vertical gap={20}>
+            <Typography.Title level={5} style={{ fontWeight: 600 }}>
+              Описание
+            </Typography.Title>
+            <Typography.Text style={{ fontSize: 16 }}>{data.description}</Typography.Text>
+            <Typography.Text disabled style={{ fontSize: 16, color: '#7D8B9B' }}>
+              {dayjs(new Date(data.registrationDate)).format('DD.MM.YYYY')}
+            </Typography.Text>
+          </Flex>
+          {!data.isMy && (
+            <Flex vertical gap={20}>
+              <Typography.Title level={5} style={{ fontWeight: 600 }}>
+                Другие предложения пользователя
+              </Typography.Title>
+              <Flex gap={'middle'}>
+                {data.otherBooks.map((item) => (
+                  <BookCard item={item} key={item.id} />
+                ))}
+              </Flex>
             </Flex>
-          </>
-        )}
+          )}
+        </Flex>
       </Flex>
       <ExchangeWithModal
         open={open}

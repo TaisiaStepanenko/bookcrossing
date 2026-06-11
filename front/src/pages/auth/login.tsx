@@ -71,7 +71,7 @@ export const LoginPage = () => {
       <div style={{ width: '100%' }}>
         <Row gutter={[20, 20]}>
           <Col span={24} style={{ marginBottom: '12px' }}>
-            <Typography.Title level={2} style={{ fontSize: '28px', fontWeight: 600, marginBottom: 4, lineHeight: 1.2 }}>
+            <Typography.Title level={2} style={{ fontWeight: 600, marginBottom: 4, lineHeight: 1.2 }}>
               Авторизация
             </Typography.Title>
             <Typography.Link

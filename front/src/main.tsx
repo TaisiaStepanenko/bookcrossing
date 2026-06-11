@@ -39,6 +39,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
               colorTextSecondary: '#7D8B9B',
               orange: '#F17300',
               green: '#63A552',
+              colorText: '#000F08',
+              fontFamily: 'Onest, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
             },
             components: {
               Rate: {
@@ -51,6 +53,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 colorBgSolid: '#63A552',
                 colorBorder: '#63A552',
                 defaultColor: '#63A552',
+                paddingInline: 32,
               },
               Pagination: {
                 borderRadius: 50,
@@ -66,6 +69,18 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
                 margin: 0,
                 titleMarginBottom: 0,
                 titleMarginTop: 0,
+                fontSizeHeading3: 20,
+                fontSizeHeading2: 28,
+                fontSizeHeading5: 24,
+                lineHeight: 1.2,
+              },
+              Checkbox: {
+                colorPrimary: '#63A552',
+                colorBorder: '#D6D9DF',
+                borderRadius: 4,
+              },
+              Card: {
+                colorBorderSecondary: '#D1D1D1',
               },
             },
           }}

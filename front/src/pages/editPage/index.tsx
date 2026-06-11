@@ -147,18 +147,19 @@ export const EditProfilePage = () => {
                     label="Город"
                     required
                     placeholder="Введите город"
-                    style={{ width: '100%' }}
+                    style={{ width: '100%', fontSize: '16px' }}
                     options={(cities.data || []).map(({ cityId, name }) => ({ value: cityId, label: name }))}
                   />
                 </Col>
 
                 <Col span={24}>
                   <Button
+                    type="primary"
                     color="primary"
+                    style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2, marginTop: '12px' }}
                     onClick={onSave}
-                    // disabled={isShowError && Boolean(isError)}
                   >
-                    Обновить
+                    Сохранить профиль
                   </Button>
                 </Col>
               </Row>
