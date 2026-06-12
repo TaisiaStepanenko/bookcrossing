@@ -166,20 +166,26 @@ export const ExchangeCard = ({
     })
 
   return (
-    <Card style={{ width: '100%' }}>
-      <Flex vertical gap="middle">
-        <Flex gap="small">
-          <Avatar src={`${process.env.VITE_API_URL}${data.avatar}`} />
-          <Flex vertical>
-            <Typography.Title style={{ margin: 0 }} level={4}>
+    <Card style={{ width: '100%', borderRadius: 20 }} styles={{ body: { padding: '20px 20px' } }}>
+      <Flex vertical gap={32}>
+        <Flex gap="middle" align="center">
+          <Avatar
+            size={64}
+            style={{ backgroundColor: '#f56a00', fontSize: 28 }}
+            src={`${process.env.VITE_API_URL}${data.avatar}`}
+          >
+            {data.name[0]}
+          </Avatar>
+          <Flex vertical gap={4}>
+            <Typography.Title style={{ margin: 0 }} level={2}>
               {getTitle()}
             </Typography.Title>
             {getEndedText() ? (
-              <Typography.Text disabled>{getEndedText()}</Typography.Text>
+              <Typography.Text style={{ color: '#7D8B9B' }}>{getEndedText()}</Typography.Text>
             ) : isFree ? (
-              <Typography.Text>Книга отдаётся даром</Typography.Text>
+              <Typography.Text style={{ color: '#7D8B9B' }}>Книга отдаётся даром</Typography.Text>
             ) : (
-              <Typography.Text>
+              <Typography.Text style={{ color: '#7D8B9B' }}>
                 {data.bookCount === 'THREE'
                   ? 'Все 3 книги на 1 вашу'
                   : data.bookCount === 'TWO'

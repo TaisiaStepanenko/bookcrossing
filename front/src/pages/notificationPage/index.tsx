@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 
 import { Button, Card, Flex, Typography } from 'antd'
+import { Color } from 'antd/es/color-picker'
 
 import { pluralize } from '../../api/functions'
 import { useGetNotification, useMarkNotificationAsRead } from '../../api/hooks'
@@ -85,31 +86,39 @@ export const NotificationPage = () => {
 
   return (
     <Container>
-      <Flex vertical gap="medium" style={{ width: '100%' }}>
-        <Typography.Title level={4}>Уведомления</Typography.Title>
-        <Typography.Text disabled>
-          {data?.length} {pluralize(data?.length || 0, ['сообщение', 'сообщения', 'сообщений'])}
-        </Typography.Text>
+      <Flex vertical gap={25} style={{ width: '100%' }}>
+        <Flex vertical gap={10}>
+          <Typography.Title level={2}>Уведомления</Typography.Title>
+          <Typography.Text style={{ color: '#7D8B9B', fontSize: 18 }}>
+            {data?.length} {pluralize(data?.length || 0, ['сообщение', 'сообщения', 'сообщений'])}
+          </Typography.Text>
+        </Flex>
 
         {data?.map((notification) => (
-          <Card key={notification.notificationId} onClick={() => markAsRead(notification.notificationId)}>
-            <Flex vertical>
+          <Card
+            style={{ width: '100%', height: 'auto', borderRadius: 20 }}
+            key={notification.notificationId}
+            onClick={() => markAsRead(notification.notificationId)}
+          >
+            <Flex vertical gap={20}>
               {!notification.isRead && (
-                <Flex gap="small" align="center">
+                <Flex gap={4} align="center">
                   <img src={notificationIcon} alt="new" width={19} height={19} />
-                  <Typography.Text disabled>Новое сообщение</Typography.Text>
+                  <Typography.Text style={{ color: '#7D8B9B' }}>Новое сообщение</Typography.Text>
                 </Flex>
               )}
-              <Typography.Text>{getNotificationText(notification)}</Typography.Text>
-              {notification.messageType === `EXCHANGE` && (
-                <Typography.Link
-                  onClick={() => {
-                    handleClick(notification)
-                  }}
-                >
-                  Перейти к заявке.
-                </Typography.Link>
-              )}
+              <Flex vertical gap={'small'}>
+                <Typography.Text>{getNotificationText(notification)}</Typography.Text>
+                {notification.messageType === `EXCHANGE` && (
+                  <Typography.Link
+                    onClick={() => {
+                      handleClick(notification)
+                    }}
+                  >
+                    Перейти к заявке.
+                  </Typography.Link>
+                )}
+              </Flex>
               {notification.messageType === 'REVIEW' && (
                 <Typography.Link
                   onClick={() => {
@@ -119,7 +128,9 @@ export const NotificationPage = () => {
                   Перейти к отзыву.
                 </Typography.Link>
               )}
-              <Typography.Text disabled>{new Date(notification.createdAt).toLocaleDateString()}</Typography.Text>
+              <Typography.Text style={{ color: '#7D8B9B' }}>
+                {new Date(notification.createdAt).toLocaleDateString()}
+              </Typography.Text>
             </Flex>
           </Card>
         ))}

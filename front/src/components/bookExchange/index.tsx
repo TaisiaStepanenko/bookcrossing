@@ -18,13 +18,14 @@ export const BooksExchanges = ({ type }: { type?: 'running' | 'ended' }) => {
   }
 
   return (
-    <Flex vertical gap="small" style={{ width: '100%' }}>
+    <Flex vertical gap="middle" style={{ width: '100%' }}>
       {!type && (
         <Flex gap="small">
           <Button
             onClick={() => changeSelected('income')}
             color="default"
             variant="outlined"
+            style={{ fontSize: 16, padding: '11px 16px', height: 'auto', lineHeight: 1.2 }}
             className={selected === 'income' ? styles['selected-btn'] : styles['not-selected-btn']}
           >
             Входящие заявки
@@ -33,13 +34,14 @@ export const BooksExchanges = ({ type }: { type?: 'running' | 'ended' }) => {
             onClick={() => changeSelected('outgoing')}
             color="default"
             variant="outlined"
+            style={{ fontSize: 16, padding: '11px 16px', height: 'auto', lineHeight: 1.2 }}
             className={selected === 'outgoing' ? styles['selected-btn'] : styles['not-selected-btn']}
           >
             Исходящие заявки
           </Button>
         </Flex>
       )}
-      <Flex vertical style={{ maxHeight: '1000px', overflow: 'auto' }} gap={'small'}>
+      <Flex vertical style={{ maxHeight: '1000px', overflow: 'auto' }} gap={20}>
         {selected === 'income' && !type ? (
           <Incomming id={request.id} setExchange={setExchange} name={request.name} selected={selected} />
         ) : (
