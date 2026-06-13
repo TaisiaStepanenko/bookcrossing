@@ -195,39 +195,49 @@ export const ExchangeCard = ({
             )}
           </Flex>
         </Flex>
-        <Flex gap="small" align="center">
-          <Image src={`${process.env.VITE_API_URL}${data.ownerBook.src}`} height={240} width={178} />
-          {!isFree && <Image src={Arrows} height={80} width={69} />}
-          {!isFree &&
-            data.initiatorBooks.map((book) => (
-              <Image
-                onClick={() => type === 'incoming' && data.type === 'WAITING_RESPONSE' && onChangeSelected(book.id)}
-                src={`${process.env.VITE_API_URL}${book.src}`}
-                className={selected.includes(book.id) ? styles.selected : undefined}
-                preview={false}
-                key={book.id}
-                height={240}
-                width={178}
-              />
-            ))}
+        <Flex gap={32} align="center">
+          <Image
+            src={`${process.env.VITE_API_URL}${data.ownerBook.src}`}
+            height={240}
+            width={178}
+            style={{ objectFit: 'cover' }}
+          />
+          {!isFree && <Image src={Arrows} height={80} width={69} style={{ borderRadius: 0 }} />}
+          <Flex gap={8}>
+            {!isFree &&
+              data.initiatorBooks.map((book) => (
+                <Image
+                  onClick={() => type === 'incoming' && data.type === 'WAITING_RESPONSE' && onChangeSelected(book.id)}
+                  src={`${process.env.VITE_API_URL}${book.src}`}
+                  className={selected.includes(book.id) ? styles.selected : undefined}
+                  preview={false}
+                  key={book.id}
+                  height={240}
+                  width={178}
+                  style={{ objectFit: 'cover' }}
+                />
+              ))}
+          </Flex>
         </Flex>
-        <Flex gap="middle">
-          <Flex vertical>
-            <Typography.Title style={{ margin: 0 }} level={4}>
+        <Flex gap={32}>
+          <Flex vertical gap="small">
+            <Typography.Title style={{ margin: 0 }} level={3}>
               {data.userType === 'OWNER' ? 'Вы отдаете' : 'Вы получаете'}
             </Typography.Title>
             <Typography.Text>{data.ownerBook.name}</Typography.Text>
           </Flex>
           {!isFree && (
-            <Flex vertical>
-              <Typography.Title style={{ margin: 0 }} level={4}>
+            <Flex vertical gap="small">
+              <Typography.Title style={{ margin: 0 }} level={3}>
                 {data.userType === 'INITIATOR' ? 'Вы отдаете' : 'Вы получаете'}
               </Typography.Title>
-              {data.initiatorBooks.map((book, index) => (
-                <Typography.Text key={book.id}>
-                  {index + 1}. {book.name}
-                </Typography.Text>
-              ))}
+              <Flex vertical gap={2}>
+                {data.initiatorBooks.map((book, index) => (
+                  <Typography.Text key={book.id}>
+                    {index + 1}. {book.name}
+                  </Typography.Text>
+                ))}
+              </Flex>
             </Flex>
           )}
         </Flex>
@@ -303,11 +313,17 @@ export const ExchangeCard = ({
               color="default"
               disabled={getIsDisabledAccept()}
               variant="solid"
+              style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
               onClick={() => mutate({ activity: 'accept', keptBookIds: selected })}
             >
               Обменяться
             </Button>
-            <Button color="orange" variant="outlined" onClick={() => cancel()}>
+            <Button
+              color="orange"
+              variant="outlined"
+              style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+              onClick={() => cancel()}
+            >
               Отменить заявку
             </Button>
           </Flex>

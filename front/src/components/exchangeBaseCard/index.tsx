@@ -20,7 +20,7 @@ export const ExchangeBaseCard = ({
   return (
     <Card style={{ width: '100%', borderRadius: 20 }} styles={{ body: { padding: '20px 20px' } }}>
       <Flex gap={32}>
-        <Image src={`${process.env.VITE_API_URL}${data.src}`} height={240} width={160} style={{ objectFit: 'cover' }} />
+        <Image src={`${process.env.VITE_API_URL}${data.src}`} height={240} width={178} style={{ objectFit: 'cover' }} />
         <Flex vertical justify="space-between">
           <Flex vertical gap="large">
             <Typography.Title level={2}>{data.name}</Typography.Title>
