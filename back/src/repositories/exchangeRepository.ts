@@ -197,6 +197,7 @@ export const exchangeRepository = {
                             current_status_initiator: TransferStatus.COMPLETED_SUCCESS,
                             current_status_owner: TransferStatus.COMPLETED_SUCCESS,
                             cur_status: TransferStatus.COMPLETED_SUCCESS
+                            
                         },
                         { where: { transfer_id: exchange_id } }
                     );
