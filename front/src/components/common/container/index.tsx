@@ -32,7 +32,7 @@ export const Container = ({ children, fullHeight = true }: { children: React.Rea
   return (
     <Flex vertical>
       <div className={styles.container} style={{ gap: 0 }}>
-        <Header className={styles.header} style={{ marginBottom: 40 }}>
+        <Header className={styles.header} style={{ marginBottom: 40, alignItems: 'center' }}>
           <Flex align="center" justify="center" gap="middle">
             <div>
               <img src={Logo} style={{ cursor: 'pointer' }} onClick={() => navigate('/catalog')} />
@@ -101,7 +101,7 @@ export const Container = ({ children, fullHeight = true }: { children: React.Rea
                 Узнавайте о новых книгах раньше всех
               </Typography.Text>
             </Flex>
-            <Row gutter={[20, 0]} style={{ width: 300 }}>
+            <Row gutter={[20, 13]} style={{ width: 314 }}>
               <Col span={12}>
                 <Typography.Text>Главная</Typography.Text>
               </Col>

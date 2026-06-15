@@ -118,7 +118,6 @@ export const AddPhotos = ({
         <Upload
           listType="picture-card"
           fileList={fileList.map((file) => {
-            // Для существующих фото добавляем полный URL для отображения
             if (file.existingUrl && file.url && !file.url.startsWith('blob:')) {
               return {
                 ...file,

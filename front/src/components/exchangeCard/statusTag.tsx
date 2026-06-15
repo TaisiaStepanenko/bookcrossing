@@ -23,7 +23,11 @@ export const StatusTag = ({ status }: { status: TransferStatus }) => {
   if (!color) return null
 
   return (
-    <Tag color={COLOR[status]?.color} variant="outlined">
+    <Tag
+      color={COLOR[status]?.color}
+      variant="outlined"
+      style={{ fontSize: 16, padding: '4px 8px', textAlign: 'center' }}
+    >
       {COLOR[status]?.text}
     </Tag>
   )

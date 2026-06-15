@@ -2,7 +2,7 @@ import { useState } from 'react'
 
 import { Avatar, Button, Card, Flex, Image, message, Modal, Tag, Typography } from 'antd'
 
-import { useAddReview, useChangeStatus } from '../../api/hooks'
+import { useAddReview, useChangeStatus, useGetBook } from '../../api/hooks'
 import type { IncomingExchange, TransferStatus } from '../../api/models'
 import Arrows from '../../assets/arrows.png'
 import { OFFER_COUNT } from '../exhange'
@@ -48,6 +48,8 @@ export const ExchangeCard = ({
     }
     if (type === 'outcoming') {
       return isFree ? `Вы запросили книгу у ${data.name}` : `Ваше предложение обмена для ${data.name}`
+    } else {
+      return `Обмен с пользователем ${data.name}!`
     }
   }
 
@@ -78,7 +80,7 @@ export const ExchangeCard = ({
         return `Успешно завершён ${new Date(data.endedDate).toLocaleDateString()}`
       }
 
-      return 'Успешно завершён'
+      return `Успешно завершён`
     }
     if (status === 'COMPLETED_PREMATURELY') {
       if (data.endedDate && !isNaN(new Date(data.endedDate).getTime())) {
@@ -100,24 +102,34 @@ export const ExchangeCard = ({
   const showRunningButton = () => {
     const { currentStatusInitiator, currentStatusOwner, userType, type } = data
 
-    if (type !== 'WAITING_TO_BE_SENT' && type !== 'SENT' && type !== 'RECEIVED') return false
+    if (type !== 'WAITING_TO_BE_SENT' && type !== 'SENT') return false
 
     if (isFree) {
       if (userType === 'OWNER') {
         return currentStatusOwner === 'WAITING_TO_BE_SENT'
       }
       if (userType === 'INITIATOR') {
-        return currentStatusInitiator === 'SENT'
+        return currentStatusOwner === 'SENT' || currentStatusOwner === 'RECEIVED'
       }
 
       return false
     } else {
-      // Обмен
       if (userType === 'INITIATOR') {
-        return ['WAITING_TO_BE_SENT', 'SENT', 'RECEIVED'].includes(currentStatusInitiator)
+        if (currentStatusInitiator === 'WAITING_TO_BE_SENT') return true
+        if (currentStatusInitiator === 'SENT' && (currentStatusOwner === 'SENT' || currentStatusOwner === 'RECEIVED'))
+          return true
+
+        return false
       }
       if (userType === 'OWNER') {
-        return ['WAITING_TO_BE_SENT', 'SENT', 'RECEIVED'].includes(currentStatusOwner)
+        if (currentStatusOwner === 'WAITING_TO_BE_SENT') return true
+        if (
+          currentStatusOwner === 'SENT' &&
+          (currentStatusInitiator === 'SENT' || currentStatusInitiator === 'RECEIVED')
+        )
+          return true
+
+        return false
       }
 
       return false
@@ -129,19 +141,23 @@ export const ExchangeCard = ({
 
     if (isFree) {
       if (userType === 'OWNER' && currentStatusOwner === 'WAITING_TO_BE_SENT') return 'Отправить'
-      if (userType === 'INITIATOR' && currentStatusInitiator === 'SENT') return 'Подтвердить получение'
+      if (userType === 'INITIATOR' && (currentStatusOwner === 'SENT' || currentStatusOwner === 'RECEIVED'))
+        return 'Подтвердить получение'
 
       return ''
     } else {
       if (userType === 'INITIATOR') {
         if (currentStatusInitiator === 'WAITING_TO_BE_SENT') return 'Отправить'
-        if (currentStatusInitiator === 'SENT') return 'Подтвердить получение'
-        if (currentStatusInitiator === 'RECEIVED') return 'Завершить обмен'
+        if (currentStatusInitiator === 'SENT' && (currentStatusOwner === 'SENT' || currentStatusOwner === 'RECEIVED'))
+          return 'Подтвердить получение'
       }
       if (userType === 'OWNER') {
         if (currentStatusOwner === 'WAITING_TO_BE_SENT') return 'Отправить'
-        if (currentStatusOwner === 'SENT') return 'Подтвердить получение'
-        if (currentStatusOwner === 'RECEIVED') return 'Завершить обмен'
+        if (
+          currentStatusOwner === 'SENT' &&
+          (currentStatusInitiator === 'SENT' || currentStatusInitiator === 'RECEIVED')
+        )
+          return 'Подтвердить получение'
       }
 
       return ''
@@ -167,11 +183,11 @@ export const ExchangeCard = ({
 
   return (
     <Card style={{ width: '100%', borderRadius: 20 }} styles={{ body: { padding: '20px 20px' } }}>
-      <Flex vertical gap={32}>
+      <Flex vertical gap={32} style={{ height: 'auto' }}>
         <Flex gap="middle" align="center">
           <Avatar
             size={64}
-            style={{ backgroundColor: '#f56a00', fontSize: 28 }}
+            style={{ backgroundColor: '#f56a00', fontSize: 28, border: 0 }}
             src={`${process.env.VITE_API_URL}${data.avatar}`}
           >
             {data.name[0]}
@@ -180,19 +196,20 @@ export const ExchangeCard = ({
             <Typography.Title style={{ margin: 0 }} level={2}>
               {getTitle()}
             </Typography.Title>
-            {getEndedText() ? (
-              <Typography.Text style={{ color: '#7D8B9B' }}>{getEndedText()}</Typography.Text>
-            ) : isFree ? (
-              <Typography.Text style={{ color: '#7D8B9B' }}>Книга отдаётся даром</Typography.Text>
-            ) : (
-              <Typography.Text style={{ color: '#7D8B9B' }}>
-                {data.bookCount === 'THREE'
-                  ? 'Все 3 книги на 1 вашу'
-                  : data.bookCount === 'TWO'
-                    ? '2 из 3 книг на выбор'
-                    : '1 из 3 книг на выбор'}
-              </Typography.Text>
-            )}
+            {type !== 'running' &&
+              (getEndedText() ? (
+                <Typography.Text style={{ color: '#7D8B9B' }}>{getEndedText()}</Typography.Text>
+              ) : isFree ? (
+                <Typography.Text style={{ color: '#7D8B9B' }}>Книга отдаётся даром</Typography.Text>
+              ) : (
+                <Typography.Text style={{ color: '#7D8B9B' }}>
+                  {data.bookCount === 'THREE'
+                    ? 'Все 3 книги на 1 вашу'
+                    : data.bookCount === 'TWO'
+                      ? '2 из 3 книг на выбор'
+                      : '1 из 3 книг на выбор'}
+                </Typography.Text>
+              ))}
           </Flex>
         </Flex>
         <Flex gap={32} align="center">
@@ -220,7 +237,7 @@ export const ExchangeCard = ({
           </Flex>
         </Flex>
         <Flex gap={32}>
-          <Flex vertical gap="small">
+          <Flex vertical gap="small" style={{ width: 277 }}>
             <Typography.Title style={{ margin: 0 }} level={3}>
               {data.userType === 'OWNER' ? 'Вы отдаете' : 'Вы получаете'}
             </Typography.Title>
@@ -242,7 +259,7 @@ export const ExchangeCard = ({
           )}
         </Flex>
         {type === 'running' && (
-          <Flex gap="middle">
+          <Flex gap={32}>
             <Flex vertical gap="small">
               <Typography.Title style={{ margin: 0 }} level={4}>
                 Текущий статус
@@ -260,72 +277,106 @@ export const ExchangeCard = ({
           </Flex>
         )}
         {type === 'running' && (
-          <Flex vertical gap="middle">
-            {showRunningButton() && (
+          <Flex vertical gap={32}>
+            {showRunningButton() !== false && (
               <Button
                 color="default"
                 disabled={getIsDisabledAccept()}
                 variant="solid"
-                style={{ width: 156 }}
+                style={{
+                  padding: '12px 32px',
+                  height: 'auto',
+                  lineHeight: 1.2,
+                  width: 'auto',
+                  alignSelf: 'flex-start',
+                }}
                 onClick={() => mutate({ activity: 'accept' })}
               >
                 {runningButtonText()}
               </Button>
             )}
-            <Button color="orange" variant="outlined" style={{ width: 156 }} onClick={() => setOpenCancelModal(true)}>
-              Завершить обмен
-            </Button>
-            <Typography.Text disabled>
-              В случае возникновения проблем с данным обменом нажмитена эту кнопку
-            </Typography.Text>
-          </Flex>
-        )}
-
-        <Typography.Text strong>{getHelperText()}</Typography.Text>
-        {/* Входящие заявки – владелец книги */}
-        {type === 'incoming' && (
-          <Flex gap="small">
-            {!isFree && (
+            <Flex vertical gap="small">
               <Button
-                color="default"
-                disabled={getIsDisabledAccept()}
-                variant="solid"
-                onClick={() => mutate({ activity: 'accept', keptBookIds: selected })}
+                color="orange"
+                variant="outlined"
+                style={{
+                  padding: '12px 32px',
+                  height: 'auto',
+                  lineHeight: 1.2,
+                  width: 'auto',
+                  alignSelf: 'flex-start',
+                }}
+                onClick={() => setOpenCancelModal(true)}
               >
-                Обменяться
+                Завершить обмен
               </Button>
-            )}
-            {isFree && data.type === 'WAITING_RESPONSE' && (
-              <Button color="default" variant="solid" onClick={() => mutate({ activity: 'accept' })}>
-                Принять заявку
-              </Button>
-            )}
-            <Button color="orange" variant="outlined" onClick={() => cancel()}>
-              Отклонить
-            </Button>
+              <Typography.Text disabled>
+                В случае возникновения проблем с данным обменом вы можете досрочно завершить его.
+              </Typography.Text>
+            </Flex>
           </Flex>
         )}
 
-        {/* Исходящие заявки – инициатор (только отмена) */}
-        {type === 'outcoming' && (
-          <Flex gap="small">
-            <Button
-              color="default"
-              disabled={getIsDisabledAccept()}
-              variant="solid"
-              style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
-              onClick={() => mutate({ activity: 'accept', keptBookIds: selected })}
-            >
-              Обменяться
-            </Button>
-            <Button
-              color="orange"
-              variant="outlined"
-              style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
-              onClick={() => cancel()}
-            >
-              Отменить заявку
-            </Button>
+        {(type === 'incoming' || type === 'outcoming') && (
+          <Flex vertical gap={8}>
+            <Typography.Text strong>{getHelperText()}</Typography.Text>
+            {/* Входящие заявки – владелец книги */}
+            {type === 'incoming' && (
+              <Flex gap="small">
+                {!isFree && (
+                  <Button
+                    color="default"
+                    disabled={getIsDisabledAccept()}
+                    variant="solid"
+                    style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+                    onClick={() => mutate({ activity: 'accept', keptBookIds: selected })}
+                  >
+                    Обменяться
+                  </Button>
+                )}
+                {isFree && data.type === 'WAITING_RESPONSE' && (
+                  <Button
+                    color="default"
+                    variant="solid"
+                    style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+                    onClick={() => mutate({ activity: 'accept' })}
+                  >
+                    Принять заявку
+                  </Button>
+                )}
+                <Button
+                  color="orange"
+                  variant="outlined"
+                  style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+                  onClick={() => cancel()}
+                >
+                  Отклонить
+                </Button>
+              </Flex>
+            )}
+
+            {/* Исходящие заявки – инициатор (только отмена) */}
+            {type === 'outcoming' && (
+              <Flex gap="small">
+                <Button
+                  color="default"
+                  disabled={getIsDisabledAccept()}
+                  variant="solid"
+                  style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+                  onClick={() => mutate({ activity: 'accept', keptBookIds: selected })}
+                >
+                  Обменяться
+                </Button>
+                <Button
+                  color="orange"
+                  variant="outlined"
+                  style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+                  onClick={() => cancel()}
+                >
+                  Отменить заявку
+                </Button>
+              </Flex>
+            )}
           </Flex>
         )}
 
@@ -333,7 +384,12 @@ export const ExchangeCard = ({
           !data.hasReview &&
           (data.type === 'COMPLETED_SUCCESS' || data.type === 'COMPLETED_PREMATURELY') && (
             <Flex>
-              <Button color="default" variant="solid" onClick={() => setOpenReviewModal(true)}>
+              <Button
+                color="default"
+                variant="solid"
+                style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+                onClick={() => setOpenReviewModal(true)}
+              >
                 Оставить отзыв
               </Button>
             </Flex>

@@ -19,16 +19,21 @@ export const HomePage = () => {
   return (
     <Container>
       <div style={{ width: '100%', maxWidth: 1200 }}>
-        <Flex vertical style={{ paddingTop: 96, width: '100%' }} align="center" gap={'large'}>
-          <img src={BookCrossing} width={800} />
-          <Typography.Text style={{ textAlign: 'center' }}>
+        <Flex vertical style={{ paddingTop: 40, width: '100%' }} align="center" gap={'large'}>
+          <img src={BookCrossing} width={960} />
+          <Typography.Title style={{ textAlign: 'center', fontWeight: 400 }} level={5}>
             Меняйтесь книгами с читателями из своего города
             <br /> или любого уголка России.
-          </Typography.Text>
-          <Button color="default" variant="solid" onClick={() => navigate(`/catalog`)}>
+          </Typography.Title>
+          <Button
+            color="default"
+            variant="solid"
+            style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2, marginTop: '12px' }}
+            onClick={() => navigate(`/catalog`)}
+          >
             Книги рядом
           </Button>
-          <Flex gap="large" style={{ height: 604 }}>
+          <Flex gap="large" style={{ height: 604, marginTop: -100 }}>
             <img width={348} height={460} src={Book1} />
             <img width={348} height={460} src={Book2} style={{ alignSelf: 'center' }} />
             <img width={348} height={460} src={Book3} style={{ alignSelf: 'flex-end' }} />

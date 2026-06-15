@@ -22,7 +22,13 @@ export const ExchangeWithModal = ({
   book: Selected
 }) => {
   return (
-    <Modal open={open} onCancel={() => setOpen(false)} footer={null} width={863}>
+    <Modal
+      open={open}
+      onCancel={() => setOpen(false)}
+      footer={null}
+      width={893}
+      modalRender={(node) => <div style={{ width: 910 }}>{node}</div>}
+    >
       <NewExchange book={book} close={() => setOpen(false)} />
     </Modal>
   )
@@ -94,25 +100,25 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
   }
 
   return (
-    <Card style={{ width: '100%', maxWidth: 863 }}>
-      <Flex vertical gap="middle">
-        <Typography.Title style={{ margin: 0, textAlign: 'center' }} level={3}>
-          Заявка на{isFree ? 'получение книги' : 'обмен'}
+    <Flex vertical gap="middle" style={{ width: '100%' }}>
+      <Typography.Title style={{ margin: 0, textAlign: 'center' }} level={2}>
+        Заявка на {isFree ? 'получение книги' : 'обмен'}
+      </Typography.Title>
+
+      {!isFree && (
+        <Typography.Title style={{ margin: 0 }} level={3}>
+          Ваберете книги для обмена
         </Typography.Title>
+      )}
+
+      {/* КНИГИ */}
+      <Flex gap={32} align="center">
+        <Image src={imageUrl} height={240} width={178} style={{ objectFit: 'cover' }} />
 
         {!isFree && (
-          <Typography.Title style={{ margin: 0 }} level={4}>
-            Ваберете книги для обмена
-          </Typography.Title>
-        )}
-
-        {/* КНИГИ */}
-        <Flex gap="small" align="center">
-          <Image src={imageUrl} height={240} width={178} />
-          {!isFree && (
-            <>
-              <Image src={Arrows} height={80} width={69} />
-
+          <>
+            <Image src={Arrows} height={80} width={69} style={{ borderRadius: 0 }} />
+            <Flex gap="small">
               {[0, 1, 2].map((i) => {
                 const item = selected[i]
 
@@ -124,6 +130,7 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
                       preview={false}
                       height={240}
                       width={178}
+                      style={{ objectFit: 'cover' }}
                     />
 
                     {/* КНОПКА УДАЛЕНИЯ */}
@@ -139,25 +146,27 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
                   </div>
                 )
               })}
-            </>
-          )}
+            </Flex>
+          </>
+        )}
+      </Flex>
+
+      {/* ОПИСАНИЕ */}
+      <Flex gap={32}>
+        <Flex vertical gap="small" style={{ width: 244 }}>
+          <Typography.Title level={3} style={{ margin: 0 }}>
+            Вы получаете
+          </Typography.Title>
+          <Typography.Text>{book.name}</Typography.Text>
         </Flex>
 
-        {/* ОПИСАНИЕ */}
-        <Flex gap="middle">
-          <Flex vertical>
-            <Typography.Title level={4} style={{ margin: 0 }}>
-              Вы получаете
+        {!isFree && (
+          <Flex vertical gap="small">
+            <Typography.Title level={3} style={{ margin: 0 }}>
+              Вы предлагаете к обмену
             </Typography.Title>
-            <Typography.Text>{book.name}</Typography.Text>
-          </Flex>
 
-          {!isFree && (
-            <Flex vertical>
-              <Typography.Title level={4} style={{ margin: 0 }}>
-                Вы предлагаете к обмену
-              </Typography.Title>
-
+            <Flex vertical gap={2}>
               {selected.length ? (
                 selected.map(({ name }, index) => (
                   <Typography.Text key={index}>
@@ -168,17 +177,19 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
                 <Typography.Text>-</Typography.Text>
               )}
             </Flex>
-          )}
-        </Flex>
+          </Flex>
+        )}
+      </Flex>
 
-        {/* SELECT */}
-        {!isFree && (
+      {/* SELECT */}
+      {!isFree && (
+        <Flex vertical gap="small">
+          <Typography.Title level={3}>Выберете тип обмена</Typography.Title>
           <CustomSelect
             onChange={(v) => {
               setOfferType(v)
             }}
             value={offerType}
-            label="Способы обмена"
             required
             placeholder="Выберете способ обмена"
             style={{ width: '100%' }}
@@ -187,25 +198,31 @@ export const NewExchange = ({ book, close }: { book: Selected; close: () => void
               label: OFFER_TYPE[val as keyof typeof OFFER_TYPE],
             }))}
           />
-        )}
-
-        {/* КНОПКИ */}
-        <Flex gap="small">
-          <Button color="default" variant="solid" onClick={handleExchange}>
-            Обменяться
-          </Button>
-
-          <Button onClick={close}>Отмена</Button>
         </Flex>
+      )}
 
-        {/* ОШИБКА */}
-        {error && <Typography.Text type="danger">{error}</Typography.Text>}
+      {/* КНОПКИ */}
+      <Flex gap="small">
+        <Button
+          color="default"
+          variant="solid"
+          style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+          onClick={handleExchange}
+        >
+          Обменяться
+        </Button>
+
+        <Button style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }} onClick={close}>
+          Отмена
+        </Button>
       </Flex>
 
+      {/* ОШИБКА */}
+      {error && <Typography.Text type="danger">{error}</Typography.Text>}
       {getBookOpened && (
         <GetBook setGetBookOpened={setGetBookOpened} setSelected={setSelected} selected={selected} maxCount={3} />
       )}
-    </Card>
+    </Flex>
   )
 }
 
@@ -260,9 +277,9 @@ const GetBook = ({
                 width={178}
                 alt="book"
                 src={`${process.env.VITE_API_URL}${item.src}`}
-                style={{ borderRadius: 16 }}
+                style={{ borderRadius: 16, objectFit: 'cover' }}
               />
-              <Typography.Title level={5}>{item.name}</Typography.Title>
+              <Typography.Title level={3}>{item.name}</Typography.Title>
               <Typography.Text type="secondary">{item.author}</Typography.Text>
             </Flex>
           </Col>

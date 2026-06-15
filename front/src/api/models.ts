@@ -219,11 +219,13 @@ export interface IncomingExchange {
     id: number
     name: string
     src: string
+    is_main: boolean
   }
   initiatorBooks: {
     id: number
     name: string
     src: string
+    is_main: boolean
   }[]
 }
 

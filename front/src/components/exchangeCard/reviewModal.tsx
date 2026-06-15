@@ -48,9 +48,9 @@ export const ReviewModal = ({
   const getIsDisabled = () => data.rating === 0
 
   return (
-    <Modal open onCancel={() => setOpen(false)} footer={null}>
-      <Flex vertical gap="middle">
-        <Typography.Title level={3} style={{ textAlign: 'center', display: 'block' }}>
+    <Modal open onCancel={() => setOpen(false)} footer={null} width={821} style={{ borderRadius: 24 }}>
+      <Flex vertical gap={15}>
+        <Typography.Title level={2} style={{ textAlign: 'center', display: 'block' }}>
           Отзыв об обмене
         </Typography.Title>
         <Typography.Title style={{ margin: 0 }} level={4}>
@@ -73,7 +73,7 @@ export const ReviewModal = ({
               </svg>
             }
           />
-          <Typography.Text style={{ fontSize: 20 }}>({data.rating})</Typography.Text>
+          <Typography.Text style={{ fontSize: 20, lineHeight: '29px' }}>({data.rating})</Typography.Text>
         </Flex>
         <Typography.Title style={{ margin: 0 }} level={4}>
           Поделитесь впечатлением
@@ -84,13 +84,29 @@ export const ReviewModal = ({
           placeholder="Опишите, как прошёл обмен"
           rows={3}
         />
-        <Flex gap="small">
-          <Button color="green" variant="solid" disabled={getIsDisabled()} onClick={handleReview}>
-            Оставить отзыв
-          </Button>
-          <Button onClick={() => setOpen(false)} color="default" variant="outlined">
-            Отмена
-          </Button>
+        <Flex vertical gap="small">
+          <Flex gap="small">
+            <Button
+              color="green"
+              variant="solid"
+              style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+              disabled={getIsDisabled()}
+              onClick={handleReview}
+            >
+              Оставить отзыв
+            </Button>
+            <Button
+              onClick={() => setOpen(false)}
+              color="orange"
+              variant="outlined"
+              style={{ padding: '12px 32px', height: 'auto', lineHeight: 1.2 }}
+            >
+              Отмена
+            </Button>
+          </Flex>
+          {getIsDisabled() && (
+            <Typography.Text disabled>Для отправки отзва необходимо оценить участника обмена.</Typography.Text>
+          )}
         </Flex>
       </Flex>
     </Modal>
